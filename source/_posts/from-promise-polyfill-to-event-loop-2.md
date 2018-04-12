@@ -64,7 +64,7 @@ ecma的Jobs实际上为promise定义了标准实现。由于在es6，promise已�
 如果在V8，Event Loop将无法知道捕获promise相关任务，二者并不能协调工作。
 如果在Event Loop，必须覆盖了V8的相关实现。
 于是Html5规范规定了宿主环境必须覆盖实现ecma的Job Queues，也是就是说在浏览器环境实际上promise的回调处理由Event Loop接手。
-![](/images/eventllop/v2-a0322f548ad45bf527ab36ae76b5b11b_r.jpg)
+![](/images/eventloop/html5spec.jpg)
 
 ## Chrome的Task和MicroTask
 Tasks一般被设计为浏览器能够介入其执行间歇，以便响应用户的操作，刷新UI，不管是页面的点击或者滚动事件，如果执行栈被阻塞的了，用户将会感觉到明显的卡顿。
