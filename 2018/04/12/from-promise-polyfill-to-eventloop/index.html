@@ -78,7 +78,7 @@
 <link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="Hexo, NexT" />
+  <meta name="keywords" content="javascript," />
 
 
 
@@ -94,13 +94,21 @@
 
 
 
-<meta property="og:type" content="website">
-<meta property="og:title" content="Genuifx">
-<meta property="og:url" content="http://yoursite.com/index.html">
+<meta name="description" content="一切的开始去年某天，t0在群里扔了一道类似下面的题目（不是这道，这道来自jake）：12345678910111213console.log(&apos;script start&apos;);setTimeout(function() &amp;#123;  console.log(&apos;setTimeout&apos;);&amp;#125;, 0);Promise.resolve().then(function() &amp;#123;  cons">
+<meta name="keywords" content="javascript">
+<meta property="og:type" content="article">
+<meta property="og:title" content="从Promise到Event Loop（一）">
+<meta property="og:url" content="http://yoursite.com/2018/04/12/from-promise-polyfill-to-eventloop/index.html">
 <meta property="og:site_name" content="Genuifx">
+<meta property="og:description" content="一切的开始去年某天，t0在群里扔了一道类似下面的题目（不是这道，这道来自jake）：12345678910111213console.log(&apos;script start&apos;);setTimeout(function() &amp;#123;  console.log(&apos;setTimeout&apos;);&amp;#125;, 0);Promise.resolve().then(function() &amp;#123;  cons">
 <meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://yoursite.com/images/WX20180327-210644.png">
+<meta property="og:image" content="http://yoursite.com/images/Promise%20polyfill.png">
+<meta property="og:updated_time" content="2018-04-12T07:47:50.249Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Genuifx">
+<meta name="twitter:title" content="从Promise到Event Loop（一）">
+<meta name="twitter:description" content="一切的开始去年某天，t0在群里扔了一道类似下面的题目（不是这道，这道来自jake）：12345678910111213console.log(&apos;script start&apos;);setTimeout(function() &amp;#123;  console.log(&apos;setTimeout&apos;);&amp;#125;, 0);Promise.resolve().then(function() &amp;#123;  cons">
+<meta name="twitter:image" content="http://yoursite.com/images/WX20180327-210644.png">
 
 
 
@@ -129,13 +137,13 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/"/>
+  <link rel="canonical" href="http://yoursite.com/2018/04/12/from-promise-polyfill-to-eventloop/"/>
 
 
 
 
 
-  <title>Genuifx</title>
+  <title>从Promise到Event Loop（一） | Genuifx</title>
   
 
 
@@ -154,9 +162,7 @@
     
   
 
-  <div class="container sidebar-position-left 
-   page-home 
- ">
+  <div class="container sidebar-position-left page-post-detail ">
     <div class="headband"></div>
 
     <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
@@ -239,9 +245,9 @@
         <div class="content-wrap">
           <div id="content" class="content">
             
-  <section id="posts" class="posts-expand">
+
+  <div id="posts" class="posts-expand">
     
-      
 
   
 
@@ -271,9 +277,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/04/12/from-promise-polyfill-to-eventloop/" itemprop="url">从Promise到Event Loop（一）</a></h1>
+          <h1 class="post-title" itemprop="name headline">从Promise到Event Loop（一）</h1>
         
 
         <div class="post-meta">
@@ -323,9 +327,7 @@
       
 
       
-        
-          
-            <h1 id="一切的开始"><a href="#一切的开始" class="headerlink" title="一切的开始"></a>一切的开始</h1><p>去年某天，t0在群里扔了一道类似下面的题目（不是这道，这道来自<a href="https://jakearchibald.com/2015/tasks-microtasks-queues-and-schedules/" title="jake" target="_blank" rel="external">jake</a>）：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="built_in">console</span>.log(<span class="string">'script start'</span>);</div><div class="line"></div><div class="line">setTimeout(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</div><div class="line">  <span class="built_in">console</span>.log(<span class="string">'setTimeout'</span>);</div><div class="line">&#125;, <span class="number">0</span>);</div><div class="line"></div><div class="line"><span class="built_in">Promise</span>.resolve().then(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</div><div class="line">  <span class="built_in">console</span>.log(<span class="string">'promise1'</span>);</div><div class="line">&#125;).then(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</div><div class="line">  <span class="built_in">console</span>.log(<span class="string">'promise2'</span>);</div><div class="line">&#125;);</div><div class="line"></div><div class="line"><span class="built_in">console</span>.log(<span class="string">'script end'</span>);</div></pre></td></tr></table></figure></p>
+        <h1 id="一切的开始"><a href="#一切的开始" class="headerlink" title="一切的开始"></a>一切的开始</h1><p>去年某天，t0在群里扔了一道类似下面的题目（不是这道，这道来自<a href="https://jakearchibald.com/2015/tasks-microtasks-queues-and-schedules/" title="jake" target="_blank" rel="external">jake</a>）：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="built_in">console</span>.log(<span class="string">'script start'</span>);</div><div class="line"></div><div class="line">setTimeout(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</div><div class="line">  <span class="built_in">console</span>.log(<span class="string">'setTimeout'</span>);</div><div class="line">&#125;, <span class="number">0</span>);</div><div class="line"></div><div class="line"><span class="built_in">Promise</span>.resolve().then(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</div><div class="line">  <span class="built_in">console</span>.log(<span class="string">'promise1'</span>);</div><div class="line">&#125;).then(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</div><div class="line">  <span class="built_in">console</span>.log(<span class="string">'promise2'</span>);</div><div class="line">&#125;);</div><div class="line"></div><div class="line"><span class="built_in">console</span>.log(<span class="string">'script end'</span>);</div></pre></td></tr></table></figure></p>
 <p>当时大家都说出一个理所应当的答案<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">script start</div><div class="line">script end</div><div class="line">promise1</div><div class="line">promise2</div><div class="line">setTimeout</div></pre></td></tr></table></figure></p>
 <p>然而，有细心的同学把用例放到ie8下面跑的时候就会发现结果有些细小的差异：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">script start</div><div class="line">script end</div><div class="line">setTimeout</div><div class="line">promise1</div><div class="line">promise2</div></pre></td></tr></table></figure></p>
 <p>这里冒出了2个问题：</p>
@@ -357,8 +359,6 @@
 [从Promise到Event Loop（二）](http://km.weoa.com/group/fe/article/3474) -->
 <h1 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h1><p><a href="https://developer.mozilla.org/zh-CN/docs/Web/API/MutationObserver" target="_blank" rel="external">MutationObserver</a><br><a href="https://caniuse.com/#search=MutationObserver" target="_blank" rel="external">Caniuse</a><br><a href="https://github.com/YuzuJS/setImmediate#macrotasks-and-microtasks." target="_blank" rel="external">macroTask and microTask</a></p>
 
-          
-        
       
     </div>
     
@@ -373,134 +373,36 @@
 
     <footer class="post-footer">
       
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/08/18/index/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="iveswen">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/uploads/avatar_mini.png">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Genuifx">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/08/18/index/" itemprop="url">index</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-08-18T17:11:56+08:00">
-                2017-08-18
-              </time>
-            
-
-            
-
-            
-          </span>
-
+        <div class="post-tags">
           
-
+            <a href="/tags/javascript/" rel="tag"># javascript</a>
           
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
         </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>Hello, world!</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
       
 
       
       
-        <div class="post-eof"></div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/08/18/index/" rel="next" title="index">
+                <i class="fa fa-chevron-left"></i> index
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
       
     </footer>
   </div>
@@ -510,10 +412,11 @@
   </article>
 
 
-    
-  </section>
 
-  
+    <div class="post-spread">
+      
+    </div>
+  </div>
 
 
           </div>
@@ -521,6 +424,10 @@
 
 
           
+  <div class="comments" id="comments">
+    
+  </div>
+
 
         </div>
         
@@ -541,8 +448,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <section class="site-overview sidebar-panel sidebar-panel-active">
+      <section class="site-overview sidebar-panel">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
           <img class="site-author-image" itemprop="image"
                src="/uploads/avatar_mini.png"
@@ -595,6 +511,22 @@
 
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#一切的开始"><span class="nav-number">1.</span> <span class="nav-text">一切的开始</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Promise-Polyfill"><span class="nav-number">2.</span> <span class="nav-text">Promise Polyfill</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-node4-直接使用process-nextTick"><span class="nav-number">2.0.1.</span> <span class="nav-text">1. node4+ 直接使用process.nextTick</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-在支持MutationObserver的浏览器使用Observer"><span class="nav-number">2.0.2.</span> <span class="nav-text">2. 在支持MutationObserver的浏览器使用Observer</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-当前环境已经有打promise的补丁的话，直接使用promise补丁"><span class="nav-number">2.0.3.</span> <span class="nav-text">3. 当前环境已经有打promise的补丁的话，直接使用promise补丁</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-当以上情况都不适用，使用下面的几种backup"><span class="nav-number">2.0.4.</span> <span class="nav-text">4. 当以上情况都不适用，使用下面的几种backup</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参考资料"><span class="nav-number">3.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       
@@ -725,10 +657,10 @@
 
 
   
-    <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
 <script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
 
-  
+
 
   
 
