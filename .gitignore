@@ -6,3 +6,4 @@ node_modules/
 public/
 .deploy*/
 ./themes/*
+!./themes/next6/_config.yml
