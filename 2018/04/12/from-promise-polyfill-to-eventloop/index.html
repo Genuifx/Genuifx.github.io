@@ -5,7 +5,7 @@
   
 
 
-<html class="theme-next pisces use-motion" lang="zh-Hans">
+<html class="theme-next muse use-motion" lang="zh-Hans">
 <head>
   <meta charset="UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=edge" />
@@ -37,36 +37,7 @@
 
 
 
-  
-  
-  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
 
-
-
-
-  
-  
-  
-  
-
-  
-    
-    
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-    
-    
-    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
-  
 
 
 
@@ -75,7 +46,22 @@
 
 <link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
 
-<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
+<link href="/css/main.css?v=6.0.0" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.0.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.0.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.0.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.0.0" color="#222">
+
+
+
 
 
   <meta name="keywords" content="javascript," />
@@ -87,28 +73,28 @@
 
 
 
-  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2" />
 
 
-
-
-
-
-<meta name="description" content="一切的开始去年某天，t0在群里扔了一道类似下面的题目（不是这道，这道来自jake）：12345678910111213console.log(&apos;script start&apos;);setTimeout(function() &amp;#123;  console.log(&apos;setTimeout&apos;);&amp;#125;, 0);Promise.resolve().then(function() &amp;#123;  cons">
+<meta name="description" content="前言在上一章我们提出了一个promise和setTimeout回调执行顺序的疑问，并且一起研究了promise-polyfill的源码实现。然而，最初的问题还是没有得到解答，同时引出了更多的关于异步时序的思考，为了真正解决这个问题，我们必须深入理解一些js实现底层的东西。 热身我们从下面这张经典图解开始了解，（引用自Robert） 这是一张js实现的模型图，请注意我的措辞“js实现”；实际上ecm">
 <meta name="keywords" content="javascript">
 <meta property="og:type" content="article">
-<meta property="og:title" content="从Promise到Event Loop（一）">
-<meta property="og:url" content="http://yoursite.com/2018/04/12/from-promise-polyfill-to-eventloop/index.html">
+<meta property="og:title" content="从Promise到Event Loop（二）">
+<meta property="og:url" content="http://yoursite.com/2018/04/12/from-promise-polyfill-to-event-loop-2/index.html">
 <meta property="og:site_name" content="Genuifx">
-<meta property="og:description" content="一切的开始去年某天，t0在群里扔了一道类似下面的题目（不是这道，这道来自jake）：12345678910111213console.log(&apos;script start&apos;);setTimeout(function() &amp;#123;  console.log(&apos;setTimeout&apos;);&amp;#125;, 0);Promise.resolve().then(function() &amp;#123;  cons">
+<meta property="og:description" content="前言在上一章我们提出了一个promise和setTimeout回调执行顺序的疑问，并且一起研究了promise-polyfill的源码实现。然而，最初的问题还是没有得到解答，同时引出了更多的关于异步时序的思考，为了真正解决这个问题，我们必须深入理解一些js实现底层的东西。 热身我们从下面这张经典图解开始了解，（引用自Robert） 这是一张js实现的模型图，请注意我的措辞“js实现”；实际上ecm">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="http://yoursite.com/images/WX20180327-210644.png">
-<meta property="og:image" content="http://yoursite.com/images/Promise%20polyfill.png">
-<meta property="og:updated_time" content="2018-04-12T07:47:50.249Z">
+<meta property="og:image" content="http://yoursite.com/images/eventloop/model.png">
+<meta property="og:image" content="http://yoursite.com/images/1_tqkykdU69DFrxi82JOWLbQ.png">
+<meta property="og:image" content="http://yoursite.com/images/eventloop/WX20180327-233228.png">
+<meta property="og:image" content="http://yoursite.com/images/eventllop/v2-a0322f548ad45bf527ab36ae76b5b11b_r.jpg">
+<meta property="og:image" content="http://yoursite.com/images/eventloop/1_tqkykdU69DFrxi82JOWLbQ.png">
+<meta property="og:image" content="http://yoursite.com/images/eventloop/nodejs-EventLoop.jpg">
+<meta property="og:image" content="http://yoursite.com/images/eventloop/node-event-loop.png">
+<meta property="og:updated_time" content="2018-04-12T08:29:03.332Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="从Promise到Event Loop（一）">
-<meta name="twitter:description" content="一切的开始去年某天，t0在群里扔了一道类似下面的题目（不是这道，这道来自jake）：12345678910111213console.log(&apos;script start&apos;);setTimeout(function() &amp;#123;  console.log(&apos;setTimeout&apos;);&amp;#125;, 0);Promise.resolve().then(function() &amp;#123;  cons">
-<meta name="twitter:image" content="http://yoursite.com/images/WX20180327-210644.png">
+<meta name="twitter:title" content="从Promise到Event Loop（二）">
+<meta name="twitter:description" content="前言在上一章我们提出了一个promise和setTimeout回调执行顺序的疑问，并且一起研究了promise-polyfill的源码实现。然而，最初的问题还是没有得到解答，同时引出了更多的关于异步时序的思考，为了真正解决这个问题，我们必须深入理解一些js实现底层的东西。 热身我们从下面这张经典图解开始了解，（引用自Robert） 这是一张js实现的模型图，请注意我的措辞“js实现”；实际上ecm">
+<meta name="twitter:image" content="http://yoursite.com/images/eventloop/model.png">
 
 
 
@@ -116,11 +102,14 @@
   var NexT = window.NexT || {};
   var CONFIG = {
     root: '/',
-    scheme: 'Pisces',
-    sidebar: {"position":"left","display":"post","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
-    fancybox: true,
+    scheme: 'Muse',
+    version: '6.0.0',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
     tabs: true,
-    motion: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
     duoshuo: {
       userId: '0',
       author: '博主'
@@ -137,7 +126,7 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/2018/04/12/from-promise-polyfill-to-eventloop/"/>
+  <link rel="canonical" href="http://yoursite.com/2018/04/12/from-promise-polyfill-to-event-loop-2/"/>
 
 
 
@@ -162,11 +151,11 @@
     
   
 
-  <div class="container sidebar-position-left page-post-detail ">
+  <div class="container sidebar-position-left page-post-detail">
     <div class="headband"></div>
 
     <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
-      <div class="header-inner"><div class="site-brand-wrapper">
+      <div class="header-inner"> <div class="site-brand-wrapper">
   <div class="site-meta ">
     
 
@@ -217,16 +206,6 @@
           </a>
         </li>
       
-        
-        <li class="menu-item menu-item-tags">
-          <a href="/tags/" rel="section">
-            
-              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
-            
-            标签
-          </a>
-        </li>
-      
 
       
     </ul>
@@ -265,7 +244,7 @@
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="iveswen">
       <meta itemprop="description" content="">
-      <meta itemprop="image" content="/uploads/avatar_mini.png">
+      <meta itemprop="image" content="/images/avatar.gif">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
@@ -289,9 +268,7 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-12T15:31:12+08:00">
-                2018-04-12
-              </time>
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-12T15:31:12+08:00">2018-04-12</time>
             
 
             
@@ -342,7 +319,7 @@
 <p>照例先上一段代码：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// core-js/modules/_microtask.js</span></div><div class="line"></div><div class="line">  <span class="comment">// Node.js</span></div><div class="line">  <span class="keyword">if</span> (isNode) &#123;</div><div class="line">    notify = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</div><div class="line">      process.nextTick(flush);</div><div class="line">    &#125;;</div><div class="line">  <span class="comment">// browsers with MutationObserver</span></div><div class="line">  &#125; <span class="keyword">else</span> <span class="keyword">if</span> (Observer) &#123;</div><div class="line">    <span class="keyword">var</span> toggle = <span class="literal">true</span>;</div><div class="line">    <span class="keyword">var</span> node = <span class="built_in">document</span>.createTextNode(<span class="string">''</span>);</div><div class="line">    <span class="keyword">new</span> Observer(flush).observe(node, &#123; <span class="attr">characterData</span>: <span class="literal">true</span> &#125;); <span class="comment">// eslint-disable-line no-new</span></div><div class="line">    notify = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</div><div class="line">      node.data = toggle = !toggle;</div><div class="line">    &#125;;</div><div class="line">  <span class="comment">// environments with maybe non-completely correct, but existent Promise</span></div><div class="line">  &#125; <span class="keyword">else</span> <span class="keyword">if</span> (<span class="built_in">Promise</span> &amp;&amp; <span class="built_in">Promise</span>.resolve) &#123;</div><div class="line">    <span class="keyword">var</span> promise = <span class="built_in">Promise</span>.resolve();</div><div class="line">    notify = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</div><div class="line">      promise.then(flush);</div><div class="line">    &#125;;</div><div class="line">  <span class="comment">// for other environments - macrotask based on:</span></div><div class="line">  <span class="comment">// - setImmediate</span></div><div class="line">  <span class="comment">// - MessageChannel</span></div><div class="line">  <span class="comment">// - window.postMessag</span></div><div class="line">  <span class="comment">// - onreadystatechange</span></div><div class="line">  <span class="comment">// - setTimeout</span></div><div class="line">  &#125; <span class="keyword">else</span> &#123;</div><div class="line">    notify = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</div><div class="line">      <span class="comment">// strange IE + webpack dev server bug - use .call(global)</span></div><div class="line">      macrotask.call(global, flush);</div><div class="line">    &#125;;</div><div class="line">  &#125;</div></pre></td></tr></table></figure></p>
 <p>代码很简单，通过环境，浏览器的版本等因素找到一个最适合的promise的实现，具体思路如下：</p>
 <h3 id="1-node4-直接使用process-nextTick"><a href="#1-node4-直接使用process-nextTick" class="headerlink" title="1. node4+ 直接使用process.nextTick"></a>1. node4+ 直接使用process.nextTick</h3><p>nextTick是node的私有方法，允许在当前调用栈结束立刻执行回调。</p>
-<h3 id="2-在支持MutationObserver的浏览器使用Observer"><a href="#2-在支持MutationObserver的浏览器使用Observer" class="headerlink" title="2. 在支持MutationObserver的浏览器使用Observer"></a>2. 在支持MutationObserver的浏览器使用Observer</h3><p>MutationObserver用于监听DOM节点，当节点发生变化的时候，执行回调函数。(MutationObserver同样在vue源码中用上了~)当前MutationObserver的proposal已经被废弃。<br><img src="/images/WX20180327-210644.png" alt="MutationObserver"></p>
+<h3 id="2-在支持MutationObserver的浏览器使用Observer"><a href="#2-在支持MutationObserver的浏览器使用Observer" class="headerlink" title="2. 在支持MutationObserver的浏览器使用Observer"></a>2. 在支持MutationObserver的浏览器使用Observer</h3><p>MutationObserver用于监听DOM节点，当节点发生变化的时候，执行回调函数。(MutationObserver同样在vue源码中用上了~)当前MutationObserver的proposal已经被废弃。<br><img src="/images/eventloop/WX20180327-210644.png" alt="MutationObserver"></p>
 <h3 id="3-当前环境已经有打promise的补丁的话，直接使用promise补丁"><a href="#3-当前环境已经有打promise的补丁的话，直接使用promise补丁" class="headerlink" title="3. 当前环境已经有打promise的补丁的话，直接使用promise补丁"></a>3. 当前环境已经有打promise的补丁的话，直接使用promise补丁</h3><p>因为如果不支持1，2两种方式的话，说明完全标准的promise补丁已经没法实现了，这个时候只能委屈求全了。</p>
 <h3 id="4-当以上情况都不适用，使用下面的几种backup"><a href="#4-当以上情况都不适用，使用下面的几种backup" class="headerlink" title="4. 当以上情况都不适用，使用下面的几种backup"></a>4. 当以上情况都不适用，使用下面的几种backup</h3><ul>
 <li>node0.8-的process.nextTick(<a href="https://github.com/nodejs/node/wiki/API-changes-between-v0.8-and-v0.10" target="_blank" rel="external">node0.8-的process.nextTick属于macroTask</a>)</li>
@@ -352,7 +329,7 @@
 <li>IE8-监听节点的ONREADYSTATECHANGE事件</li>
 <li>setTimeout (最后的无奈)</li>
 </ul>
-<p>补一张图片说明：<br><img src="/images/Promise polyfill.png" alt="promise-polyfill"></p>
+<p>补一张图片说明：<br><img src="/images/eventloop/Promise polyfill.png" alt="promise-polyfill"></p>
 <p>至此可以清晰的了解到core-js的补丁思路，当1，2行的通的时候我们会得到一个“相对标准”的promise。3，4能让我们得到一个“勉强实现的promise”<br>这里回到我们的问题，当文章的示例脚本跑在IE8的时候，很明显我们逻辑会走到ONREADYSTATECHANGE这儿，那么为什么监听的事件回调为什么比setTimeout慢执行呢？是不是所有的事件回调都比setTimeout慢呢？http请求的呢？到底异步队列是怎么实现的？标准如何？</p>
 <p>故事很长，下回再续。</p>
 <!-- # 下回
@@ -398,6 +375,10 @@
 
           <div class="post-nav-prev post-nav-item">
             
+              <a href="/2018/04/12/from-promise-polyfill-to-event-loop-2/" rel="prev" title="从Promise到Event Loop（二）">
+                从Promise到Event Loop（二） <i class="fa fa-chevron-right"></i>
+              </a>
+            
           </div>
         </div>
       
@@ -424,9 +405,9 @@
 
 
           
-  <div class="comments" id="comments">
-    
-  </div>
+
+  
+
 
 
         </div>
@@ -449,66 +430,64 @@
 
       
         <ul class="sidebar-nav motion-element">
-          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
             文章目录
           </li>
-          <li class="sidebar-nav-overview" data-target="site-overview">
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
             站点概览
           </li>
         </ul>
       
 
-      <section class="site-overview sidebar-panel">
-        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
-          <img class="site-author-image" itemprop="image"
-               src="/uploads/avatar_mini.png"
-               alt="iveswen" />
-          <p class="site-author-name" itemprop="name">iveswen</p>
-           
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">iveswen</p>
               <p class="site-description motion-element" itemprop="description"></p>
-          
-        </div>
-        <nav class="site-state motion-element">
+          </div>
 
-          
-            <div class="site-state-item site-state-posts">
-              <a href="/archives/">
-                <span class="site-state-item-count">2</span>
-                <span class="site-state-item-name">日志</span>
-              </a>
-            </div>
-          
+          <nav class="site-state motion-element">
 
-          
-
-          
             
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">3</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
             
-            <div class="site-state-item site-state-tags">
+
+            
+
+            
               
-                <span class="site-state-item-count">2</span>
-                <span class="site-state-item-name">标签</span>
               
-            </div>
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">2</span>
+                  <span class="site-state-item-name">标签</span>
+                
+              </div>
+            
+
+          </nav>
+
           
 
-        </nav>
-
-        
-
-        <div class="links-of-author motion-element">
           
+
+          
+          
+
+          
+          
+
+          
+
         </div>
-
-        
-        
-
-        
-        
-
-        
-
-
       </section>
 
       
@@ -541,31 +520,29 @@
 
     <footer id="footer" class="footer">
       <div class="footer-inner">
-        <div class="copyright" >
-  
-  &copy; 
-  <span itemprop="copyrightYear">2018</span>
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
   <span class="with-love">
-    <i class="fa fa-heart"></i>
+    <i class="fa fa-user"></i>
   </span>
   <span class="author" itemprop="copyrightHolder">iveswen</span>
+
+  
 
   
 </div>
 
 
-  <div class="powered-by">
-    由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
-  </div>
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
 
   <span class="post-meta-divider">|</span>
 
-  <div class="theme-info">
-    主题 &mdash;
-    <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
-      NexT.Pisces
-    </a>
-  </div>
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/theme-next/hexo-theme-next">NexT.Muse</a> v6.0.0</div>
+
+
 
 
         
@@ -587,6 +564,8 @@
       </div>
     
 
+    
+
   </div>
 
   
@@ -605,7 +584,6 @@
 
 
 
-  
 
 
 
@@ -618,54 +596,47 @@
 
 
 
-  
-  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
-
-  
-  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
-
-  
-  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
-
-  
-  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
-
-  
-  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
-
-  
-  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
-
-
-  
-
-
-  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
-
-  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
 
 
 
   
   
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
 
 
-  <script type="text/javascript" src="/js/src/affix.js?v=5.1.2"></script>
+  
 
-  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.0.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.0.0"></script>
 
 
 
   
-  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
-<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.0.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.0.0"></script>
 
 
 
   
 
 
-  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.0.0"></script>
 
 
 
@@ -698,6 +669,10 @@
 
 
 
+
+
+
+
   
 
 
@@ -708,6 +683,9 @@
 
   
 
+  
+
+  
   
 
   
