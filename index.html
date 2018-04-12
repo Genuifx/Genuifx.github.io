@@ -359,7 +359,7 @@
 <p>原因很简单，web api 或者说 BOM，DOM这些都不是ecma的语言规范。</p>
 <p>图中的内容老生常谈了，几乎每个js教程关于Event Loop都会挂这个，但还是稍微介绍一下：</p>
 <h3 id="1-heap（堆）"><a href="#1-heap（堆）" class="headerlink" title="1. heap（堆）"></a>1. heap（堆）</h3><p>用于分配对象，对象名实际上一个指向一堆无结构的内存区域（同C语言的结构体？），需要注意的是，当我们形成闭包的时候，实际上作用域链也是保存到堆了。</p>
-<h3 id="2-stack（栈）"><a href="#2-stack（栈）" class="headerlink" title="2. stack（栈）"></a>2. stack（栈）</h3><p>函数调用栈，当调用一个函数的时候，我们把函数入栈，当函数执行完毕，则从当前栈中弹出函数，并且继续执行下一个函数。javascript是单线程的语言主要是提现在这里，因为一个“thread”只有一个调用栈，所以一个时间片下永远都只能“专心”处理一件事，调用栈同样有调用深度的限制，一个无限循环自我调用的函数会把栈搞爆。<br><img src="/images/1_tqkykdU69DFrxi82JOWLbQ.png" alt=""></p>
+<h3 id="2-stack（栈）"><a href="#2-stack（栈）" class="headerlink" title="2. stack（栈）"></a>2. stack（栈）</h3><p>函数调用栈，当调用一个函数的时候，我们把函数入栈，当函数执行完毕，则从当前栈中弹出函数，并且继续执行下一个函数。javascript是单线程的语言主要是提现在这里，因为一个“thread”只有一个调用栈，所以一个时间片下永远都只能“专心”处理一件事，调用栈同样有调用深度的限制，一个无限循环自我调用的函数会把栈搞爆。<br><img src="/images/eventloop/1_tqkykdU69DFrxi82JOWLbQ.png" alt=""></p>
 <blockquote>
 <p>引用自Medium</p>
 </blockquote>
@@ -375,7 +375,7 @@
 <h3 id="Ecma-262的Jobs和Job-Queues"><a href="#Ecma-262的Jobs和Job-Queues" class="headerlink" title="Ecma-262的Jobs和Job Queues"></a>Ecma-262的Jobs和Job Queues</h3><p>上面我们说过，ecma并没有Event Loop的规范，但是如果读过ecma-262的spec的同学就会发现，在<a href="http://www.ecma-international.org/ecma-262/6.0/#sec-jobs-and-job-queues" target="_blank" rel="external">8-4</a>有一个神奇的Jobs和Job Queues章节，被光速打脸了吗？不存在的</p>
 <p>ecma的Jobs实际上为promise定义了标准实现。由于在es6，promise已经成为了语言标准之一，而ecma的引擎需要不依赖宿主实现promise，例如V8能够脱离浏览器单独运行，在没有浏览器webApi支持的情况下依然要支持promise实现。所以spec里面有这边规定并不奇怪。</p>
 <p>所以Jobs Queues和Event Loop实际上是两个东西，那么当V8在chrome运行的时候，就会有一个问题，promise的回调应该在哪里运行？<br>如果在V8，Event Loop将无法知道捕获promise相关任务，二者并不能协调工作。<br>如果在Event Loop，必须覆盖了V8的相关实现。<br>于是Html5规范规定了宿主环境必须覆盖实现ecma的Job Queues，也是就是说在浏览器环境实际上promise的回调处理由Event Loop接手。<br><img src="/images/eventllop/v2-a0322f548ad45bf527ab36ae76b5b11b_r.jpg" alt=""></p>
-<h2 id="Chrome的Task和MicroTask"><a href="#Chrome的Task和MicroTask" class="headerlink" title="Chrome的Task和MicroTask"></a>Chrome的Task和MicroTask</h2><p>Tasks一般被设计为浏览器能够介入其执行间歇，以便响应用户的操作，刷新UI，不管是页面的点击或者滚动事件，如果执行栈被阻塞的了，用户将会感觉到明显的卡顿。<br><img src="/images/eventloop/1_tqkykdU69DFrxi82JOWLbQ.png" alt=""></p>
+<h2 id="Chrome的Task和MicroTask"><a href="#Chrome的Task和MicroTask" class="headerlink" title="Chrome的Task和MicroTask"></a>Chrome的Task和MicroTask</h2><p>Tasks一般被设计为浏览器能够介入其执行间歇，以便响应用户的操作，刷新UI，不管是页面的点击或者滚动事件，如果执行栈被阻塞的了，用户将会感觉到明显的卡顿。<br><img src="/images/eventloop/1_MCt4ZC0dMVhJsgo1u6lpYw.jpeg" alt=""></p>
 <p>MicroTask一般则为了快速响应回调处理，如果当前调用栈没有其他执行函数的话，就会尽快的按照顺序调用对应回调，所以如果当前上下文已经没有待处理函数，或者两个Task之间的间歇都会执行MicroTask。值得注意的是，如果当前执行的MicroTask又动态添加了一个MicroTask的话，新的MicroTask会在这个周期内马上执行~</p>
 <h3 id="类型"><a href="#类型" class="headerlink" title="类型"></a>类型</h3><p>属于Task的的回调类型有： <code>setTimeout</code>，<code>XMLHttpRequest</code>， <code>IndexDB</code>，<code>事件IO</code>，<code>postMessage</code><br>属于MicroTask的回调类型有：<code>Promise</code>，<code>MutationObserver</code></p>
 <h3 id="执行规则"><a href="#执行规则" class="headerlink" title="执行规则"></a>执行规则</h3><ol>
