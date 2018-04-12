@@ -84,5 +84,5 @@ disqus:
 deploy:
   type: git
   repo: https://github.com/genuifx/genuifx.github.io.git
-  branch: gh-page
+  branch: master
 
