@@ -22,7 +22,7 @@ tags: javascript
 
 ### 2. stack（栈）
 函数调用栈，当调用一个函数的时候，我们把函数入栈，当函数执行完毕，则从当前栈中弹出函数，并且继续执行下一个函数。javascript是单线程的语言主要是提现在这里，因为一个“thread”只有一个调用栈，所以一个时间片下永远都只能“专心”处理一件事，调用栈同样有调用深度的限制，一个无限循环自我调用的函数会把栈搞爆。
-![](/images/1_tqkykdU69DFrxi82JOWLbQ.png)
+![](/images/eventloop/1_tqkykdU69DFrxi82JOWLbQ.png)
 > 引用自Medium
 
 ### 3. Event Loop
@@ -68,7 +68,7 @@ ecma的Jobs实际上为promise定义了标准实现。由于在es6，promise已�
 
 ## Chrome的Task和MicroTask
 Tasks一般被设计为浏览器能够介入其执行间歇，以便响应用户的操作，刷新UI，不管是页面的点击或者滚动事件，如果执行栈被阻塞的了，用户将会感觉到明显的卡顿。
-![](/images/eventloop/1_tqkykdU69DFrxi82JOWLbQ.png)
+![](/images/eventloop/1_MCt4ZC0dMVhJsgo1u6lpYw.jpeg)
 
 MicroTask一般则为了快速响应回调处理，如果当前调用栈没有其他执行函数的话，就会尽快的按照顺序调用对应回调，所以如果当前上下文已经没有待处理函数，或者两个Task之间的间歇都会执行MicroTask。值得注意的是，如果当前执行的MicroTask又动态添加了一个MicroTask的话，新的MicroTask会在这个周期内马上执行~
 
