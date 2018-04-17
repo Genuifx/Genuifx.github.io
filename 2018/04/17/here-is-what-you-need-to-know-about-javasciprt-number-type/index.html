@@ -1,0 +1,930 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.1.0" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/uploads/falcon.jpg?v=6.1.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/uploads/falcon.jpg?v=6.1.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/uploads/falcon.jpg?v=6.1.0">
+
+
+  <link rel="mask-icon" href="/uploads/falcon.jpg?v=6.1.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '6.1.0',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="原文地址： https://medium.com/dailyjs/javascripts-number-type-8d59199db1b6 为什么0.1+0.2不等于0.3， 而9007199254740992 等于 9007199254740993  大多数静态语言的数字都有不同的数据类型，比方说你想保存一个在[-128; 127]之间的整数，C语言你可以用char，Java可以用byte，他">
+<meta property="og:type" content="article">
+<meta property="og:title" content="关于Javascript的Number类型，你需要知道的东西">
+<meta property="og:url" content="http://yoursite.com/2018/04/17/here-is-what-you-need-to-know-about-javasciprt-number-type/index.html">
+<meta property="og:site_name" content="Genuifx">
+<meta property="og:description" content="原文地址： https://medium.com/dailyjs/javascripts-number-type-8d59199db1b6 为什么0.1+0.2不等于0.3， 而9007199254740992 等于 9007199254740993  大多数静态语言的数字都有不同的数据类型，比方说你想保存一个在[-128; 127]之间的整数，C语言你可以用char，Java可以用byte，他">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://yoursite.com/images/float%20point/1-wrong.png">
+<meta property="og:image" content="http://yoursite.com/images/float%20point/1-right.png">
+<meta property="og:image" content="http://yoursite.com/images/float%20point/stackoverflow.png">
+<meta property="og:image" content="http://yoursite.com/images/float%20point/scientificNotation.png">
+<meta property="og:image" content="http://yoursite.com/images/float%20point/snexample.png">
+<meta property="og:image" content="http://yoursite.com/images/float%20point/snexample2.png">
+<meta property="og:image" content="http://yoursite.com/images/float%20point/snexample3.png">
+<meta property="og:image" content="http://yoursite.com/images/float%20point/snnormallized.png">
+<meta property="og:image" content="http://yoursite.com/images/float%20point/fp.png">
+<meta property="og:image" content="http://yoursite.com/images/float%20point/fptable.png">
+<meta property="og:image" content="http://yoursite.com/images/float%20point/1.png">
+<meta property="og:image" content="http://yoursite.com/images/float%20point/1-wrong.png">
+<meta property="og:image" content="http://yoursite.com/images/float%20point/1-right.png">
+<meta property="og:image" content="http://yoursite.com/images/float%20point/offsetbinary.png">
+<meta property="og:image" content="http://yoursite.com/images/float%20point/3n.png">
+<meta property="og:image" content="http://yoursite.com/images/float%20point/1offsetbinary.png">
+<meta property="og:image" content="http://yoursite.com/images/float%20point/3fp.png">
+<meta property="og:image" content="http://yoursite.com/images/float%20point/0.1c.png">
+<meta property="og:image" content="http://yoursite.com/images/float%20point/0.1sn.png">
+<meta property="og:image" content="http://yoursite.com/images/float%20point/0.1round.png">
+<meta property="og:image" content="http://yoursite.com/images/float%20point/0.1offset.png">
+<meta property="og:image" content="http://yoursite.com/images/float%20point/0.1fp.png">
+<meta property="og:image" content="http://yoursite.com/images/float%20point/0.2fp.png">
+<meta property="og:image" content="http://yoursite.com/images/float%20point/0.10.2sn.png">
+<meta property="og:image" content="http://yoursite.com/images/float%20point/0.1sn2.png">
+<meta property="og:image" content="http://yoursite.com/images/float%20point/add.png">
+<meta property="og:image" content="http://yoursite.com/images/float%20point/0.3calc.png">
+<meta property="og:image" content="http://yoursite.com/images/float%20point/resultround.png">
+<meta property="og:image" content="http://yoursite.com/images/float%20point/resultfp.png">
+<meta property="og:image" content="http://yoursite.com/images/float%20point/maxsafeint.png">
+<meta property="og:image" content="http://yoursite.com/images/float%20point/maxsafeintsn.png">
+<meta property="og:image" content="http://yoursite.com/images/float%20point/maxsafeintn.png">
+<meta property="og:image" content="http://yoursite.com/images/float%20point/maxsafecalc.png">
+<meta property="og:image" content="http://yoursite.com/images/float%20point/NaN.png">
+<meta property="og:image" content="http://yoursite.com/images/float%20point/Infinity.png">
+<meta property="og:updated_time" content="2018-04-17T16:47:55.059Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="关于Javascript的Number类型，你需要知道的东西">
+<meta name="twitter:description" content="原文地址： https://medium.com/dailyjs/javascripts-number-type-8d59199db1b6 为什么0.1+0.2不等于0.3， 而9007199254740992 等于 9007199254740993  大多数静态语言的数字都有不同的数据类型，比方说你想保存一个在[-128; 127]之间的整数，C语言你可以用char，Java可以用byte，他">
+<meta name="twitter:image" content="http://yoursite.com/images/float%20point/1-wrong.png">
+
+
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/04/17/here-is-what-you-need-to-know-about-javasciprt-number-type/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>关于Javascript的Number类型，你需要知道的东西 | Genuifx</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"> 
+
+<div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Genuifx</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <h1 class="site-subtitle" itemprop="description">世界和平</h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+          
+  <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />Home</a>
+</li>
+
+      
+        
+        
+          
+  <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />Archives</a>
+</li>
+
+      
+
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+  
+
+
+
+ </div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/17/here-is-what-you-need-to-know-about-javasciprt-number-type/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="iveswen">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/uploads/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Genuifx">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">关于Javascript的Number类型，你需要知道的东西</h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-17T15:59:10+08:00">2018-04-17</time>
+            
+
+            
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/04/17/here-is-what-you-need-to-know-about-javasciprt-number-type/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/04/17/here-is-what-you-need-to-know-about-javasciprt-number-type/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <blockquote>
+<p>原文地址： <a href="https://medium.com/dailyjs/javascripts-number-type-8d59199db1b6" target="_blank" rel="external">https://medium.com/dailyjs/javascripts-number-type-8d59199db1b6</a></p>
+<p>为什么0.1+0.2不等于0.3， 而9007199254740992 等于 9007199254740993</p>
+</blockquote>
+<p>大多数静态语言的数字都有不同的数据类型，比方说你想保存一个在<code>[-128; 127]</code>之间的整数，<code>C</code>语言你可以用<code>char</code>，<code>Java</code>可以用<code>byte</code>，他们都占用一个字节。如果你要存储一个大的数字，你可以使用4字节的<code>int</code>或者8字节的<code>long</code>。这些语言对带小数的数字同样有其特殊的数据类型，譬如4字节的<code>float</code>和8字节的<code>double</code>。这两种类型一般都称为浮点类型，后面我们会知道这个名字的缘来。</p>
+<p>但是在<code>Javascript</code>中，我们没有那么多的类型。根据ECMAScript标准，数字只有一种类型，双精度，64位二进制IEEE 754格式的值。这种类型和C与Java的double类型一样，用于存储整数和小数。一些js的开发者没有意识到这一点，于是觉得<code>1</code>是这样存储的：</p>
+<p><img src="/images/float point/1-wrong.png" alt=""></p>
+<p>然而，实际上是存成这样子的：</p>
+<p><img src="/images/float point/1-right.png" alt=""></p>
+<p>这个误解可能引起很大的困惑，比方说下面这个Java的循环</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">for</span> (<span class="keyword">int</span> i=<span class="number">1</span>; <span class="number">1</span>/i &gt; <span class="number">0</span>; i++) &#123;</div><div class="line">    System.out.println(<span class="string">"Count is: "</span> + i);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>我们很容易知道它是怎么结束循环的，第二次循环的迭代的是会后<code>i</code>变成<code>2</code>，然后<code>1/2</code>等于<code>0.5</code>,因为是int类型，结果被截断为<code>0</code>。循环结束。</p>
+<p>现在想象下同样的循环跑在Javascript下：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">for</span> (<span class="keyword">var</span> i=<span class="number">1</span>; <span class="number">1</span>/i &gt; <span class="number">0</span>; i++) &#123;</div><div class="line">    <span class="built_in">console</span>.log(<span class="string">"Count is: "</span> + i);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>这是个死循环(╯﹏╰)，因为<code>1/i</code>不会得到一个整数，而是一个浮点数。想知道为啥不，继续往下阅读把💯</p>
+<p>另外一个不熟悉Javascript的人会经常提的问题是0.1加0.2等于<code>0.30000000000000004</code>, 这意味着0.1加0.2不等于0.3。stackoverflow上面有许多这个现象的问题：</p>
+<p><img src="/images/float point/stackoverflow.png" alt=""></p>
+<p>有意思的是，这个问题总是跟Javascript出现，实际上任何使用浮点数的语言都会有这个问题，也就是说，要是你在C或者Java里面用float和double类型，结果是一样的。另外有趣的是0.1+0.2其实不等于浏览器打印的<code>0.30000000000000004</code>，而是<code>0.3000000000000000444089209850062616169452667236328125</code>。</p>
+<p>这篇文章将会解释浮点数，作为示例会分析上述的for循环和0.1+0.2现象。</p>
+<h2 id="使用科学计数法表示数字"><a href="#使用科学计数法表示数字" class="headerlink" title="使用科学计数法表示数字"></a>使用科学计数法表示数字</h2><p>在开始浮点数讲解之后，我们先了解下科学计数法，一般表示为一下形式：</p>
+<p><img src="/images/float point/scientificNotation.png" alt=""></p>
+<p>significand表示数字重要的数值部分，一般称之为尾数或者精度。尾数不包括0，0只是占位作用。Base则指定了数字系统的基数，如10进制的基数是10，二进制的基数是2。Exponent则决定了小数点要往左或者往右移动几位。</p>
+<p>所有的数字都可以用科学计数法表示比方说：</p>
+<p><img src="/images/float point/snexample.png" alt=""></p>
+<p>指数为0意味着小数点不需要移动。<code>0.00000022</code>表示如下：</p>
+<p><img src="/images/float point/snexample2.png" alt=""></p>
+<p>转化之后，我们就可以重新定义每个数字的部分了：</p>
+<p><img src="/images/float point/snexample3.png" alt=""></p>
+<p>规范化科学计数法：</p>
+<p><img src="/images/float point/snnormallized.png" alt=""></p>
+<p>科学计数法可以理解为数字的浮点表示。“浮点”本来就意味着数字的小数点是可以浮动的。<br>另外根据科学计数法的特点我们会知道，规范化的科学计数写法对二进制数字来说，整数永远都是1。</p>
+<h2 id="IEEE-754浮点数"><a href="#IEEE-754浮点数" class="headerlink" title="IEEE 754浮点数"></a>IEEE 754浮点数</h2><p>IEEE 754定义了很多关于浮点的运算，现在我们只对数字是怎么保存，四舍五入和相加的感兴趣。四舍五入是一个很频繁的操作，一般发生在选定的格式不够保存数字的时候。另外一篇文章有详细讲解<a href="https://medium.com/@maximus.koretskyi/how-to-round-binary-fractions-625c8fa3a1af#.e9nykp8sj" target="_blank" rel="external">二进制的四舍五入</a>。了解其中的机制非常的重要。</p>
+<p>现在我们来看看数字是怎么保存的吧~</p>
+<h3 id="理解数字的存储"><a href="#理解数字的存储" class="headerlink" title="理解数字的存储"></a>理解数字的存储</h3><p>标准规定的格式里面，最常用的是单精度和双精度两种。两者不同的地方在于占用的字节数和能表示的数字范围。将一个科学计数法表示的数字转化为IEEE754格式的算法适用于单精度和双精度，他们只是尾数和指数部分的位数不一样。</p>
+<p>IEEE754浮点数分符号位，尾数和指数。双精度的格式是这么分配的（Javascript的数字类型）：</p>
+<p><img src="/images/float point/fp.png" alt=""></p>
+<p>标志位1位，11位的指数以及52位的尾数。用表格这么表示：</p>
+<p><img src="/images/float point/fptable.png" alt=""></p>
+<p>指数使用偏移二进制存储，另一篇<a href="https://medium.com/@maximus.koretskyi/the-mechanics-behind-exponent-bias-in-floating-point-9b3185083528#.zacphtue3" target="_blank" rel="external">文章</a>有详细的讲解</p>
+<h3 id="整数是如何存储的"><a href="#整数是如何存储的" class="headerlink" title="整数是如何存储的"></a>整数是如何存储的</h3><p>来看看<code>1</code>是怎么表示<br>首先用科学计数法表示如下：</p>
+<p><img src="/images/float point/1.png" alt=""></p>
+<p>这样子我们便知道尾数是<code>1</code>，指数是0。得到这个信息之后，你可能觉得浮点表示如下：</p>
+<p><img src="/images/float point/1-wrong.png" alt=""></p>
+<p>事实如何呢？Javascript没有内置的函数可以直接让你看到数字的存储的位模式。于是我写了一个函数来打印数字的存储方式（在不考虑大小端的情况下。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">to64bitFloat</span>(<span class="params">number</span>) </span>&#123;</div><div class="line">    <span class="keyword">var</span> i, result = <span class="string">""</span>;</div><div class="line">    <span class="keyword">var</span> dv = <span class="keyword">new</span> <span class="built_in">DataView</span>(<span class="keyword">new</span> <span class="built_in">ArrayBuffer</span>(<span class="number">8</span>));</div><div class="line"></div><div class="line">    dv.setFloat64(<span class="number">0</span>, number, <span class="literal">false</span>);</div><div class="line"></div><div class="line">    <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; <span class="number">8</span>; i++) &#123;</div><div class="line">        <span class="keyword">var</span> bits = dv.getUint8(i).toString(<span class="number">2</span>);</div><div class="line">        <span class="keyword">if</span> (bits.length &lt; <span class="number">8</span>) &#123;</div><div class="line">            bits = <span class="keyword">new</span> <span class="built_in">Array</span>(<span class="number">8</span> - bits.length).fill(<span class="string">'0'</span>).join(<span class="string">""</span>) + bits;</div><div class="line">        &#125;</div><div class="line">        result += bits;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">return</span> result;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>调用这个函数，你就会知道<code>1</code>是这样存储的：</p>
+<p><img src="/images/float point/1-right.png" alt=""></p>
+<p>跟想象中的完全不一样啊，尾数部分没有数字，指数部分有很多1。为啥会这样呢？首先我们得知道所有数字都是从规范化的科学计数写法转化过来的。这么做有什么好处呢？如果小数点左边的数字永远是1的话，那么就不用浪费一位去保存它了，在执行数学运算的时候，硬件会这个1补回来。因为<code>1</code>的小数点右边没有其他数，所以尾数部分我们没有东西可以保存，全是0。</p>
+<p>现在看看指数部分的1是怎么来的。如上述提到的指数存储的偏移二进制，计算如下：</p>
+<p><img src="/images/float point/offsetbinary.png" alt=""></p>
+<p>可以看到这就是上述表示中的值，所以<code>0</code>在偏移二进制的确是这么保存的。如果还不清楚的话，可以查看我的另外一篇<a href="https://medium.com/@maximus.koretskyi/the-mechanics-behind-exponent-bias-in-floating-point-9b3185083528#.2q5qxmdn3" target="_blank" rel="external">文章</a>。</p>
+<p>现在让我们尝试用上面学到的东西来试着对<code>3</code>进行浮点表示把。二进制中3表示为<code>11</code>，规范化之后就是：</p>
+<p><img src="/images/float point/3n.png" alt=""></p>
+<p>小数点之后只有一个数字是1，上述可知小数点右边的1是不存储的，同时根据规范化的结果可以知道指数部分是<code>1</code>。接着算一下<code>1</code>的偏移二进制怎么表示吧：</p>
+<p><img src="/images/float point/1offsetbinary.png" alt=""></p>
+<p>另外一点需要注意的是，尾数部分数字按照科学计数法的表示的顺序放置–即从小数点开始从左到右依序填入。综上所述，用浮点数表示3为：</p>
+<p><img src="/images/float point/3fp.png" alt=""></p>
+<p>用我前面提供的函数会得到一样的结果哦。</p>
+<h3 id="为什么0-1-0-2不是0-3"><a href="#为什么0-1-0-2不是0-3" class="headerlink" title="为什么0.1+0.2不是0.3"></a>为什么0.1+0.2不是0.3</h3><p>既然我们知道数字是如何保存的，接下来看看这个经典的问题。标准的解答如下：</p>
+<blockquote>
+<p>二进制里面带分母的分数只有2的倍数才能被有限的表示。因为0.1的分母是10，0.2的分母是5都不是2的倍数，所以这些数字不能被有限小数表示。为了以IEEE 754浮点数保存这些小数，不得不把这些尾数进行四舍五入，半进度的10位，单精度的23位，双精度的52位。根据不同的精度位数，浮点数会把0.1和0.2转化比其数学表示大或者小的数。正因为如此0.1+0.2总是不等于0.3</p>
+</blockquote>
+<p>这个解释对一些开发者来说已经够了，但更好的方式是搞清楚底层到底发生了什么。这就是我们现在要做的事情。</p>
+<h3 id="将0-1和0-2进行浮点表示"><a href="#将0-1和0-2进行浮点表示" class="headerlink" title="将0.1和0.2进行浮点表示"></a>将0.1和0.2进行浮点表示</h3><p>先看看0.1的浮点表示。首先需要做的事是转化0.1为二进制，一直乘以2即可：</p>
+<p><img src="/images/float point/0.1c.png" alt=""></p>
+<p>接着用规范化的科学计数法表示它：</p>
+<p><img src="/images/float point/0.1sn.png" alt=""></p>
+<p>由于尾数只有52位，于是我们得把无限循环的小数做四舍五入</p>
+<p><img src="/images/float point/0.1round.png" alt=""></p>
+<p>最后一件事，计算-4的偏移二进制表示：</p>
+<p><img src="/images/float point/0.1offset.png" alt=""></p>
+<p>于是0.1的浮点表示为：</p>
+<p><img src="/images/float point/0.1fp.png" alt=""></p>
+<p>0.2的浮点表示建议自己实践下哈~</p>
+<p><img src="/images/float point/0.2fp.png" alt=""></p>
+<h3 id="计算0-1-0-2的结果"><a href="#计算0-1-0-2的结果" class="headerlink" title="计算0.1+0.2的结果"></a>计算0.1+0.2的结果</h3><p>将上述数字从浮点表示转为科学计数法表示的话，得下面的结果：</p>
+<p><img src="/images/float point/0.10.2sn.png" alt=""></p>
+<p>要将两数相加的话，需要先将指数部分转为相等。</p>
+<p><img src="/images/float point/0.1sn2.png" alt=""></p>
+<p>相加可得：</p>
+<p><img src="/images/float point/add.png" alt=""></p>
+<p>我们需要用浮点表示了相加的结果，所以接下来只需要将他规范化，四舍五入，计算偏移二进制即可：</p>
+<p><img src="/images/float point/0.3calc.png" alt=""></p>
+<p>规范化之后发现超过52位了，我们需要做一次四舍五入：</p>
+<p><img src="/images/float point/resultround.png" alt=""></p>
+<p>最终的浮点表示为：</p>
+<p><img src="/images/float point/resultfp.png" alt=""></p>
+<p>这就是当你计算0.1+0.2的时候保存的准确结果。为了得到这个结果，计算机做三次四舍五入，每个数字各一次，结果一次。而单纯的保存0.3的时候，只做了一次四舍五入。正是四舍五入导致了0.1+0.2的结果跟0.3的表示不一致。当Javascript执行<code>0.1+0.2===0.3</code>的时候，实际上做了按位比较，因为结果不同，自然就返回false了。而0.1和0.2在二进制中不用被有限表示，四舍五入总是存在，故0.1+0.2永远都不会等于0.3。</p>
+<h3 id="为什么for循环会停不下来？"><a href="#为什么for循环会停不下来？" class="headerlink" title="为什么for循环会停不下来？"></a>为什么<code>for</code>循环会停不下来？</h3><p>理解for循环为什么死循环的关键是<code>9007199254740991</code>。这个数字非常的特殊，以至于他有自己的常量表示，下面是EcmaScript标准关于其的描述：</p>
+<blockquote>
+<p><code>Number.MAX_SAFE_INTEGER</code>是一个最大的数字n以至于n+1都可以准确表示一个数字值。<code>Number.MAX_SAFE_INTEGER</code>等于9007199254740991（2⁵³−1）</p>
+</blockquote>
+<p>MDN是这么解释的：</p>
+<blockquote>
+<p>常量中的safe指的是能准确表示和比较的整数，譬如<code>Number.MAX_SAFE_INTEGER + 1 === Number.MAX_SAFE_INTEGER + 2</code>会得到true，而这从数理角度是不对的。</p>
+</blockquote>
+<p>首先需要明确的一点是，它不是js能表示的最大的数，比如数字<code>9007199254740994</code>即<code>MAX_SAFE_INTEGER + 3</code>也能被安全的表示。如果要找最大能表示的数字的话，因为用<code>Number.MAX_VALUE</code>（等于<code>1.7976931348623157e+308</code>）这个常量。令人惊讶的是，在<code>MAX_SAFE_INTEGER</code>和<code>MAX_VALUE</code>之间有许多数字不能被表示。实际上在<code>MAX_SAFE_INTEGER</code>和<code>MAX_SAFE_INTEGER+3</code>之间就有一个数字不能被表示：<code>9007199254740993</code>。如果你把这个数输入console中，你会发现它等于<code>9007199254740992</code>。</p>
+<p>为了理解到底发生了什么，我们先看看<code>9007199254740991 (MAX_SAFE_INTEGER)</code>的浮点表示：</p>
+<p><img src="/images/float point/maxsafeint.png" alt=""></p>
+<p>转为科学计数法表示为：</p>
+<p><img src="/images/float point/maxsafeintsn.png" alt=""></p>
+<p>右移小数点52位得：</p>
+<p><img src="/images/float point/maxsafeintn.png" alt=""></p>
+<p>也就是为了保存<code>MAX_SAFE_INTEGER</code>，指数为52的情况下，我们用光了尾数所有的位数来表示它。由于所有位都被用了，要表示更大的数字只能把指数增加1。指数变为<code>53</code>的话，我们得把小数点右移53位，由于尾数只有52位，我们只能在最后添加<code>0</code>补充了,所以指数<code>54</code>就需要补2个0，<code>55</code>就要3个，依次类推。</p>
+<p>这会有什么影响呢，也许你已经猜到了。由于所有大于<code>MAX_SAFE_INTEGER</code>的数，我们会以0结尾，那也就没有奇数能被浮点表示了！</p>
+<p><img src="/images/float point/maxsafecalc.png" alt=""></p>
+<p>能看到<code>9007199254740993</code>和<code>9007199254740993</code>都不能被64位的浮点数表示。如果你继续试下去便会发现不能表示的数字会有偶数出现！例如<code>9007199254740998</code>。而随着指数的增加，不能表示的范围会越来越大！</p>
+<h3 id="死循环"><a href="#死循环" class="headerlink" title="死循环"></a>死循环</h3><p>再看看<code>for</code>循环：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">for</span> (<span class="keyword">var</span> i=<span class="number">1</span>; <span class="number">1</span>/i &gt; <span class="number">0</span>; i++) &#123;</div><div class="line">    <span class="built_in">console</span>.log(<span class="string">"Count is: "</span> + i);</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>它不会停下来，上面提到了以为<code>1/i</code>的结果不是一个整数，而是浮点数。现在你已经知道浮点数和<code>Number.MAX_SAFE_INTEGER</code>了，应该很容易理解为啥它不会停止循环。</p>
+<p>如果要循环结束的话，<code>i</code>必须变成<code>Infinity</code>， 因为<code>1/Infinity &gt; 0</code> 是<code>false</code>。 当然这永远不会发生。上面的章节我解释了为啥一些数字不能被表示，以及他们被四舍五入为最近可表达的偶数。当i增加到<code>9007199254740993</code>的时候(也就是<code>MAX_SAFE_INTEGER+2</code>)，由于最后一位数字无法表示，于是只能四舍五入到<code>9007199254740992</code>。于是循环便卡在这两个数字之间了。</p>
+<h2 id="关于NaN和Infinity的几句话"><a href="#关于NaN和Infinity的几句话" class="headerlink" title="关于NaN和Infinity的几句话"></a>关于<code>NaN</code>和<code>Infinity</code>的几句话</h2><p>我决定对<code>NaN</code>和<code>Infinity</code>做一点简述作为文章的结束。<code>NaN</code>意味着<code>Not a Number</code>，它和<code>Infinity</code>不一样，尽管他们都被当初浮点操作的特殊例子去处理。它们的指数是<code>1024</code>（即<code>11111111111</code>），而<code>Number.MAX_VALUE</code>的指数是<code>1023</code>（即<code>111111111101</code>）。</p>
+<p>由于<code>NaN</code>是用浮点表示的，所以当你看到<code>typeof NaN</code>返回<code>number</code>的时候，应该不会惊讶了吧。哦，对了，它的尾数有一个1：</p>
+<p><img src="/images/float point/NaN.png" alt=""></p>
+<p>有许多数学操作都会得到<code>NaN</code>的结果，例如<code>0/0</code>或者<code>Math.sqrt(-4)</code>。Javascript中有一些函数也会返回<code>NaN</code>，譬如<code>parseInt</code>。而有意思的地方是，所有和<code>NaN</code>的比较操作都会返回<code>false</code>。例如下面的操作都会得到<code>false</code>：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="literal">NaN</span> === <span class="literal">NaN</span></div><div class="line"><span class="literal">NaN</span> &gt; <span class="literal">NaN</span></div><div class="line"><span class="literal">NaN</span> &lt; <span class="literal">NaN</span></div><div class="line"></div><div class="line"><span class="literal">NaN</span> &gt; <span class="number">3</span></div><div class="line"><span class="literal">NaN</span> &lt; <span class="number">3</span></div><div class="line"><span class="literal">NaN</span> === <span class="number">3</span></div></pre></td></tr></table></figure></p>
+<p>只有<code>NaN</code>是不等于自身的，要检查一个值是不是<code>NaN</code>的话，得调用<code>isNaN</code>函数。</p>
+<p><code>Infinity</code>则是另外一个浮点表示中设计来用处理溢出和一些数学操作的特殊用例，譬如<code>1/0</code>。<code>Infinity</code>表示如下：</p>
+<p><img src="/images/float point/Infinity.png" alt=""></p>
+<p>正的<code>Infinity</code>符号位是0，负的<code>Infinity</code>是1。MDN有一篇<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Infinity" target="_blank" rel="external">文章</a>介绍了一些得到<code>Infinity</code>的操作。和<code>NaN</code>不同的是，<code>Infinity</code>可以很安全的用于比较操作。</p>
+<blockquote>
+<p>原文地址： <a href="https://medium.com/dailyjs/javascripts-number-type-8d59199db1b6" target="_blank" rel="external">https://medium.com/dailyjs/javascripts-number-type-8d59199db1b6</a></p>
+</blockquote>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/04/12/from-promise-polyfill-to-event-loop-2/" rel="next" title="从Promise到Event Loop（二）">
+                <i class="fa fa-chevron-left"></i> 从Promise到Event Loop（二）
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+        </noscript>
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/uploads/avatar.jpg"
+                alt="iveswen" />
+            
+              <p class="site-author-name" itemprop="name">iveswen</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">4</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">2</span>
+                    <span class="site-state-item-name">tags</span>
+                  
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/genuifx" target="_blank" title="GitHub" rel="external nofollow"><i class="fa fa-fw fa-github"></i>GitHub</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="mailto:genuifx@gmail.com" target="_blank" title="E-Mail" rel="external nofollow"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="https://twitter.com/ZetianWen" target="_blank" title="Twitter" rel="external nofollow"><i class="fa fa-fw fa-twitter"></i>Twitter</a>
+                  
+                </span>
+              
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#使用科学计数法表示数字"><span class="nav-number">1.</span> <span class="nav-text">使用科学计数法表示数字</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#IEEE-754浮点数"><span class="nav-number">2.</span> <span class="nav-text">IEEE 754浮点数</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#理解数字的存储"><span class="nav-number">2.1.</span> <span class="nav-text">理解数字的存储</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#整数是如何存储的"><span class="nav-number">2.2.</span> <span class="nav-text">整数是如何存储的</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#为什么0-1-0-2不是0-3"><span class="nav-number">2.3.</span> <span class="nav-text">为什么0.1+0.2不是0.3</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#将0-1和0-2进行浮点表示"><span class="nav-number">2.4.</span> <span class="nav-text">将0.1和0.2进行浮点表示</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#计算0-1-0-2的结果"><span class="nav-number">2.5.</span> <span class="nav-text">计算0.1+0.2的结果</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#为什么for循环会停不下来？"><span class="nav-number">2.6.</span> <span class="nav-text">为什么for循环会停不下来？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#死循环"><span class="nav-number">2.7.</span> <span class="nav-text">死循环</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#关于NaN和Infinity的几句话"><span class="nav-number">3.</span> <span class="nav-text">关于NaN和Infinity的几句话</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate"> 
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">iveswen</span>
+
+  
+
+  
+</div>
+
+
+  
+
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" rel="external nofollow" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" rel="external nofollow" href="https://github.com/theme-next/hexo-theme-next">NexT.Mist</a> v6.1.0</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.1.0"></script>
+
+
+
+  
+
+  
+    <script id="dsq-count-scr" src="https://genuifx.disqus.com/count.js" async></script>
+  
+
+  
+    <script type="text/javascript">
+      var disqus_config = function () {
+        this.page.url = 'http://yoursite.com/2018/04/17/here-is-what-you-need-to-know-about-javasciprt-number-type/';
+        this.page.identifier = '2018/04/17/here-is-what-you-need-to-know-about-javasciprt-number-type/';
+        this.page.title = '关于Javascript的Number类型，你需要知道的东西';
+      };
+      function loadComments () {
+        var d = document, s = d.createElement('script');
+        s.src = 'https://genuifx.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', '' + +new Date());
+        (d.head || d.body).appendChild(s);
+      }
+      
+        loadComments();
+      
+    </script>
+  
+
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
