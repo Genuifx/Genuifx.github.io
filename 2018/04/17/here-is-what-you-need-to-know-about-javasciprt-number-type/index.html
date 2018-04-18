@@ -141,7 +141,7 @@
 <meta property="og:image" content="http://yoursite.com/images/float%20point/maxsafecalc.png">
 <meta property="og:image" content="http://yoursite.com/images/float%20point/NaN.png">
 <meta property="og:image" content="http://yoursite.com/images/float%20point/Infinity.png">
-<meta property="og:updated_time" content="2018-04-18T04:10:19.610Z">
+<meta property="og:updated_time" content="2018-04-18T04:11:17.880Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="关于Javascript的Number类型，你需要知道的东西">
 <meta name="twitter:description" content="原文地址： https://medium.com/dailyjs/javascripts-number-type-8d59199db1b6 为什么0.1+0.2不等于0.3， 而9007199254740992 等于 9007199254740993  大多数静态语言的数字都有不同的数据类型，比方说你想保存一个在[-128; 127]之间的整数，C语言你可以用char，Java可以用byte，他">
@@ -494,7 +494,7 @@
 <p>也就是为了保存<code>MAX_SAFE_INTEGER</code>，指数为52的情况下，我们用光了尾数所有的位数来表示它。由于所有位都被用了，要表示更大的数字只能把指数增加1。指数变为<code>53</code>的话，我们得把小数点右移53位，由于尾数只有52位，我们只能在最后添加<code>0</code>补充了,所以指数<code>54</code>就需要补2个0，<code>55</code>就要3个，依次类推。</p>
 <p>这会有什么影响呢，也许你已经猜到了。由于所有大于<code>MAX_SAFE_INTEGER</code>的数，我们会以0结尾，那就意味着没有奇数能被浮点表示了！</p>
 <p><img src="/images/float point/maxsafecalc.png" alt=""></p>
-<p>能看到<code>9007199254740993</code>和<code>9007199254740993</code>都不能被64位的浮点数表示。如果你继续试下去便会发现不能表示的数字会有偶数出现！。而随着指数的增加，不能表示的范围会越来越大！</p>
+<p>能看到<code>9007199254740993</code>和<code>9007199254740993</code>都不能被64位的浮点数表示。如果你继续试下去便会发现不能表示的数字会有偶数出现！而随着指数的增加，不能表示的范围会越来越大！</p>
 <h3 id="死循环"><a href="#死循环" class="headerlink" title="死循环"></a>死循环</h3><p>再看看<code>for</code>循环：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">for</span> (<span class="keyword">var</span> i=<span class="number">1</span>; <span class="number">1</span>/i &gt; <span class="number">0</span>; i++) &#123;</div><div class="line">    <span class="built_in">console</span>.log(<span class="string">"Count is: "</span> + i);</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
 <p>它不会停下来，上面提到了以为<code>1/i</code>的结果不是一个整数，而是浮点数。现在你已经知道浮点数和<code>Number.MAX_SAFE_INTEGER</code>了，应该很容易理解为啥它不会停止循环。</p>
 <p>如果要循环结束的话，只有<code>i</code>必须变成<code>Infinity</code>， 因为<code>1/Infinity &gt; 0</code> 是<code>false</code>。 当然这永远不会发生。上面的章节我解释了为啥一些数字不能被表示，以及他们被四舍五入为最近可表达的偶数。当i增加到<code>9007199254740993</code>的时候(也就是<code>MAX_SAFE_INTEGER+2</code>)，由于最后一位数字无法表示，于是只能四舍五入到<code>9007199254740992</code>。于是循环便卡在这两个数字之间了。</p>
