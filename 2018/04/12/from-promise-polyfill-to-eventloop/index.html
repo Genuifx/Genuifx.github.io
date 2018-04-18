@@ -99,28 +99,28 @@
 
 
 
-  <meta name="description" content="一切的开始去年某天，t0在群里扔了一道类似下面的题目（不是这道，这道来自jake）：12345678910111213console.log(&apos;script start&apos;);setTimeout(function() &amp;#123;  console.log(&apos;setTimeout&apos;);&amp;#125;, 0);Promise.resolve().then(function() &amp;#123;  cons">
+  <meta name="description" content="如果你要给Promise打补丁的话，你会怎么实现？core-js又是怎么给promise打补丁的？setTimeoute和promise的执行顺序有何差异？">
 <meta name="keywords" content="javascript">
 <meta property="og:type" content="article">
 <meta property="og:title" content="从Promise到Event Loop（一）">
-<meta property="og:url" content="http://yoursite.com/2018/04/12/from-promise-polyfill-to-eventloop/index.html">
+<meta property="og:url" content="https://genuifx.github.io/2018/04/12/from-promise-polyfill-to-eventloop/index.html">
 <meta property="og:site_name" content="Genuifx">
-<meta property="og:description" content="一切的开始去年某天，t0在群里扔了一道类似下面的题目（不是这道，这道来自jake）：12345678910111213console.log(&apos;script start&apos;);setTimeout(function() &amp;#123;  console.log(&apos;setTimeout&apos;);&amp;#125;, 0);Promise.resolve().then(function() &amp;#123;  cons">
+<meta property="og:description" content="如果你要给Promise打补丁的话，你会怎么实现？core-js又是怎么给promise打补丁的？setTimeoute和promise的执行顺序有何差异？">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="http://yoursite.com/images/eventloop/WX20180327-210644.png">
-<meta property="og:image" content="http://yoursite.com/images/eventloop/Promise%20polyfill.png">
-<meta property="og:updated_time" content="2018-04-12T08:29:51.727Z">
+<meta property="og:image" content="https://genuifx.github.io/images/eventloop/WX20180327-210644.png">
+<meta property="og:image" content="https://genuifx.github.io/images/eventloop/Promise%20polyfill.png">
+<meta property="og:updated_time" content="2018-04-18T11:23:07.715Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="从Promise到Event Loop（一）">
-<meta name="twitter:description" content="一切的开始去年某天，t0在群里扔了一道类似下面的题目（不是这道，这道来自jake）：12345678910111213console.log(&apos;script start&apos;);setTimeout(function() &amp;#123;  console.log(&apos;setTimeout&apos;);&amp;#125;, 0);Promise.resolve().then(function() &amp;#123;  cons">
-<meta name="twitter:image" content="http://yoursite.com/images/eventloop/WX20180327-210644.png">
+<meta name="twitter:description" content="如果你要给Promise打补丁的话，你会怎么实现？core-js又是怎么给promise打补丁的？setTimeoute和promise的执行顺序有何差异？">
+<meta name="twitter:image" content="https://genuifx.github.io/images/eventloop/WX20180327-210644.png">
 
 
 
 
 
 
-  <link rel="canonical" href="http://yoursite.com/2018/04/12/from-promise-polyfill-to-eventloop/"/>
+  <link rel="canonical" href="https://genuifx.github.io/2018/04/12/from-promise-polyfill-to-eventloop/"/>
 
 
 
@@ -297,7 +297,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/12/from-promise-polyfill-to-eventloop/">
+    <link itemprop="mainEntityOfPage" href="https://genuifx.github.io/2018/04/12/from-promise-polyfill-to-eventloop/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="iveswen">
@@ -359,6 +359,8 @@
 
           
 
+          
+              <div class="post-description">如果你要给Promise打补丁的话，你会怎么实现？core-js又是怎么给promise打补丁的？setTimeoute和promise的执行顺序有何差异？</div>
           
 
         </div>
@@ -557,7 +559,9 @@
                     
                       
                     
-                    <span class="site-state-item-count">2</span>
+                      
+                    
+                    <span class="site-state-item-count">3</span>
                     <span class="site-state-item-name">tags</span>
                   
                 </div>
@@ -768,7 +772,7 @@
   
     <script type="text/javascript">
       var disqus_config = function () {
-        this.page.url = 'http://yoursite.com/2018/04/12/from-promise-polyfill-to-eventloop/';
+        this.page.url = 'https://genuifx.github.io/2018/04/12/from-promise-polyfill-to-eventloop/';
         this.page.identifier = '2018/04/12/from-promise-polyfill-to-eventloop/';
         this.page.title = '从Promise到Event Loop（一）';
       };

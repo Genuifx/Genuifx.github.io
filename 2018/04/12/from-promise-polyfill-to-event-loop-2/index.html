@@ -99,33 +99,33 @@
 
 
 
-  <meta name="description" content="前言在上一章我们提出了一个promise和setTimeout回调执行顺序的疑问，并且一起研究了promise-polyfill的源码实现。然而，最初的问题还是没有得到解答，同时引出了更多的关于异步时序的思考，为了真正解决这个问题，我们必须深入理解一些js实现底层的东西。 热身我们从下面这张经典图解开始了解，（引用自Robert） 这是一张js实现的模型图，请注意我的措辞“js实现”；实际上ecm">
+  <meta name="description" content="Javascript的宿主环境是怎么实现Event Loop的？ MicroTask和MacroTask的区别？nodejs的Tick和Phase了解一下~本文从promise-polyfill开始，深入介绍Event Loop的机制">
 <meta name="keywords" content="javascript">
 <meta property="og:type" content="article">
 <meta property="og:title" content="从Promise到Event Loop（二）">
-<meta property="og:url" content="http://yoursite.com/2018/04/12/from-promise-polyfill-to-event-loop-2/index.html">
+<meta property="og:url" content="https://genuifx.github.io/2018/04/12/from-promise-polyfill-to-event-loop-2/index.html">
 <meta property="og:site_name" content="Genuifx">
-<meta property="og:description" content="前言在上一章我们提出了一个promise和setTimeout回调执行顺序的疑问，并且一起研究了promise-polyfill的源码实现。然而，最初的问题还是没有得到解答，同时引出了更多的关于异步时序的思考，为了真正解决这个问题，我们必须深入理解一些js实现底层的东西。 热身我们从下面这张经典图解开始了解，（引用自Robert） 这是一张js实现的模型图，请注意我的措辞“js实现”；实际上ecm">
+<meta property="og:description" content="Javascript的宿主环境是怎么实现Event Loop的？ MicroTask和MacroTask的区别？nodejs的Tick和Phase了解一下~本文从promise-polyfill开始，深入介绍Event Loop的机制">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="http://yoursite.com/images/eventloop/model.png">
-<meta property="og:image" content="http://yoursite.com/images/eventloop/1_tqkykdU69DFrxi82JOWLbQ.png">
-<meta property="og:image" content="http://yoursite.com/images/eventloop/WX20180327-233228.png">
-<meta property="og:image" content="http://yoursite.com/images/eventloop/html5spec.jpg">
-<meta property="og:image" content="http://yoursite.com/images/eventloop/1_MCt4ZC0dMVhJsgo1u6lpYw.jpeg">
-<meta property="og:image" content="http://yoursite.com/images/eventloop/nodejs-EventLoop.jpg">
-<meta property="og:image" content="http://yoursite.com/images/eventloop/node-event-loop.png">
-<meta property="og:updated_time" content="2018-04-12T10:47:56.558Z">
+<meta property="og:image" content="https://genuifx.github.io/images/eventloop/model.png">
+<meta property="og:image" content="https://genuifx.github.io/images/eventloop/1_tqkykdU69DFrxi82JOWLbQ.png">
+<meta property="og:image" content="https://genuifx.github.io/images/eventloop/WX20180327-233228.png">
+<meta property="og:image" content="https://genuifx.github.io/images/eventloop/html5spec.jpg">
+<meta property="og:image" content="https://genuifx.github.io/images/eventloop/1_MCt4ZC0dMVhJsgo1u6lpYw.jpeg">
+<meta property="og:image" content="https://genuifx.github.io/images/eventloop/nodejs-EventLoop.jpg">
+<meta property="og:image" content="https://genuifx.github.io/images/eventloop/node-event-loop.png">
+<meta property="og:updated_time" content="2018-04-18T11:21:49.603Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="从Promise到Event Loop（二）">
-<meta name="twitter:description" content="前言在上一章我们提出了一个promise和setTimeout回调执行顺序的疑问，并且一起研究了promise-polyfill的源码实现。然而，最初的问题还是没有得到解答，同时引出了更多的关于异步时序的思考，为了真正解决这个问题，我们必须深入理解一些js实现底层的东西。 热身我们从下面这张经典图解开始了解，（引用自Robert） 这是一张js实现的模型图，请注意我的措辞“js实现”；实际上ecm">
-<meta name="twitter:image" content="http://yoursite.com/images/eventloop/model.png">
+<meta name="twitter:description" content="Javascript的宿主环境是怎么实现Event Loop的？ MicroTask和MacroTask的区别？nodejs的Tick和Phase了解一下~本文从promise-polyfill开始，深入介绍Event Loop的机制">
+<meta name="twitter:image" content="https://genuifx.github.io/images/eventloop/model.png">
 
 
 
 
 
 
-  <link rel="canonical" href="http://yoursite.com/2018/04/12/from-promise-polyfill-to-event-loop-2/"/>
+  <link rel="canonical" href="https://genuifx.github.io/2018/04/12/from-promise-polyfill-to-event-loop-2/"/>
 
 
 
@@ -302,7 +302,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/12/from-promise-polyfill-to-event-loop-2/">
+    <link itemprop="mainEntityOfPage" href="https://genuifx.github.io/2018/04/12/from-promise-polyfill-to-event-loop-2/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="iveswen">
@@ -364,6 +364,8 @@
 
           
 
+          
+              <div class="post-description">Javascript的宿主环境是怎么实现Event Loop的？ MicroTask和MacroTask的区别？nodejs的Tick和Phase了解一下~本文从promise-polyfill开始，深入介绍Event Loop的机制</div>
           
 
         </div>
@@ -593,7 +595,9 @@
                     
                       
                     
-                    <span class="site-state-item-count">2</span>
+                      
+                    
+                    <span class="site-state-item-count">3</span>
                     <span class="site-state-item-name">tags</span>
                   
                 </div>
@@ -804,7 +808,7 @@
   
     <script type="text/javascript">
       var disqus_config = function () {
-        this.page.url = 'http://yoursite.com/2018/04/12/from-promise-polyfill-to-event-loop-2/';
+        this.page.url = 'https://genuifx.github.io/2018/04/12/from-promise-polyfill-to-event-loop-2/';
         this.page.identifier = '2018/04/12/from-promise-polyfill-to-event-loop-2/';
         this.page.title = '从Promise到Event Loop（二）';
       };

@@ -99,60 +99,61 @@
 
 
 
-  <meta name="description" content="原文地址： https://medium.com/dailyjs/javascripts-number-type-8d59199db1b6 为什么0.1+0.2不等于0.3， 而9007199254740992 等于 9007199254740993  大多数静态语言的数字都有不同的数据类型，比方说你想保存一个在[-128; 127]之间的整数，C语言你可以用char，Java可以用byte，他">
+  <meta name="description" content="关于Javascript的Number类型，你需要知道所有的东西都在这里！浮点数如何表示？为什么0.1+0.2不等于0.3？9007199254740992 为什么等于 9007199254740993， 不是道德的沦丧，也不是人性的扭曲！">
+<meta name="keywords" content="Javascript，Float Point">
 <meta property="og:type" content="article">
 <meta property="og:title" content="关于Javascript的Number类型，你需要知道的东西">
-<meta property="og:url" content="http://yoursite.com/2018/04/17/here-is-what-you-need-to-know-about-javasciprt-number-type/index.html">
+<meta property="og:url" content="https://genuifx.github.io/2018/04/17/here-is-what-you-need-to-know-about-javasciprt-number-type/index.html">
 <meta property="og:site_name" content="Genuifx">
-<meta property="og:description" content="原文地址： https://medium.com/dailyjs/javascripts-number-type-8d59199db1b6 为什么0.1+0.2不等于0.3， 而9007199254740992 等于 9007199254740993  大多数静态语言的数字都有不同的数据类型，比方说你想保存一个在[-128; 127]之间的整数，C语言你可以用char，Java可以用byte，他">
+<meta property="og:description" content="关于Javascript的Number类型，你需要知道所有的东西都在这里！浮点数如何表示？为什么0.1+0.2不等于0.3？9007199254740992 为什么等于 9007199254740993， 不是道德的沦丧，也不是人性的扭曲！">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="http://yoursite.com/images/float%20point/1-wrong.png">
-<meta property="og:image" content="http://yoursite.com/images/float%20point/1-right.png">
-<meta property="og:image" content="http://yoursite.com/images/float%20point/stackoverflow.png">
-<meta property="og:image" content="http://yoursite.com/images/float%20point/scientificNotation.png">
-<meta property="og:image" content="http://yoursite.com/images/float%20point/snexample.png">
-<meta property="og:image" content="http://yoursite.com/images/float%20point/snexample2.png">
-<meta property="og:image" content="http://yoursite.com/images/float%20point/snexample3.png">
-<meta property="og:image" content="http://yoursite.com/images/float%20point/snnormallized.png">
-<meta property="og:image" content="http://yoursite.com/images/float%20point/fp.png">
-<meta property="og:image" content="http://yoursite.com/images/float%20point/fptable.png">
-<meta property="og:image" content="http://yoursite.com/images/float%20point/1.png">
-<meta property="og:image" content="http://yoursite.com/images/float%20point/1-wrong.png">
-<meta property="og:image" content="http://yoursite.com/images/float%20point/1-right.png">
-<meta property="og:image" content="http://yoursite.com/images/float%20point/offsetbinary.png">
-<meta property="og:image" content="http://yoursite.com/images/float%20point/3n.png">
-<meta property="og:image" content="http://yoursite.com/images/float%20point/1offsetbinary.png">
-<meta property="og:image" content="http://yoursite.com/images/float%20point/3fp.png">
-<meta property="og:image" content="http://yoursite.com/images/float%20point/0.1c.png">
-<meta property="og:image" content="http://yoursite.com/images/float%20point/0.1sn.png">
-<meta property="og:image" content="http://yoursite.com/images/float%20point/0.1round.png">
-<meta property="og:image" content="http://yoursite.com/images/float%20point/0.1offset.png">
-<meta property="og:image" content="http://yoursite.com/images/float%20point/0.1fp.png">
-<meta property="og:image" content="http://yoursite.com/images/float%20point/0.2fp.png">
-<meta property="og:image" content="http://yoursite.com/images/float%20point/0.10.2sn.png">
-<meta property="og:image" content="http://yoursite.com/images/float%20point/0.1sn2.png">
-<meta property="og:image" content="http://yoursite.com/images/float%20point/add.png">
-<meta property="og:image" content="http://yoursite.com/images/float%20point/0.3calc.png">
-<meta property="og:image" content="http://yoursite.com/images/float%20point/resultround.png">
-<meta property="og:image" content="http://yoursite.com/images/float%20point/resultfp.png">
-<meta property="og:image" content="http://yoursite.com/images/float%20point/maxsafeint.png">
-<meta property="og:image" content="http://yoursite.com/images/float%20point/maxsafeintsn.png">
-<meta property="og:image" content="http://yoursite.com/images/float%20point/maxsafeintn.png">
-<meta property="og:image" content="http://yoursite.com/images/float%20point/maxsafecalc.png">
-<meta property="og:image" content="http://yoursite.com/images/float%20point/NaN.png">
-<meta property="og:image" content="http://yoursite.com/images/float%20point/Infinity.png">
-<meta property="og:updated_time" content="2018-04-18T04:11:17.880Z">
+<meta property="og:image" content="https://genuifx.github.io/images/float%20point/1-wrong.png">
+<meta property="og:image" content="https://genuifx.github.io/images/float%20point/1-right.png">
+<meta property="og:image" content="https://genuifx.github.io/images/float%20point/stackoverflow.png">
+<meta property="og:image" content="https://genuifx.github.io/images/float%20point/scientificNotation.png">
+<meta property="og:image" content="https://genuifx.github.io/images/float%20point/snexample.png">
+<meta property="og:image" content="https://genuifx.github.io/images/float%20point/snexample2.png">
+<meta property="og:image" content="https://genuifx.github.io/images/float%20point/snexample3.png">
+<meta property="og:image" content="https://genuifx.github.io/images/float%20point/snnormallized.png">
+<meta property="og:image" content="https://genuifx.github.io/images/float%20point/fp.png">
+<meta property="og:image" content="https://genuifx.github.io/images/float%20point/fptable.png">
+<meta property="og:image" content="https://genuifx.github.io/images/float%20point/1.png">
+<meta property="og:image" content="https://genuifx.github.io/images/float%20point/1-wrong.png">
+<meta property="og:image" content="https://genuifx.github.io/images/float%20point/1-right.png">
+<meta property="og:image" content="https://genuifx.github.io/images/float%20point/offsetbinary.png">
+<meta property="og:image" content="https://genuifx.github.io/images/float%20point/3n.png">
+<meta property="og:image" content="https://genuifx.github.io/images/float%20point/1offsetbinary.png">
+<meta property="og:image" content="https://genuifx.github.io/images/float%20point/3fp.png">
+<meta property="og:image" content="https://genuifx.github.io/images/float%20point/0.1c.png">
+<meta property="og:image" content="https://genuifx.github.io/images/float%20point/0.1sn.png">
+<meta property="og:image" content="https://genuifx.github.io/images/float%20point/0.1round.png">
+<meta property="og:image" content="https://genuifx.github.io/images/float%20point/0.1offset.png">
+<meta property="og:image" content="https://genuifx.github.io/images/float%20point/0.1fp.png">
+<meta property="og:image" content="https://genuifx.github.io/images/float%20point/0.2fp.png">
+<meta property="og:image" content="https://genuifx.github.io/images/float%20point/0.10.2sn.png">
+<meta property="og:image" content="https://genuifx.github.io/images/float%20point/0.1sn2.png">
+<meta property="og:image" content="https://genuifx.github.io/images/float%20point/add.png">
+<meta property="og:image" content="https://genuifx.github.io/images/float%20point/0.3calc.png">
+<meta property="og:image" content="https://genuifx.github.io/images/float%20point/resultround.png">
+<meta property="og:image" content="https://genuifx.github.io/images/float%20point/resultfp.png">
+<meta property="og:image" content="https://genuifx.github.io/images/float%20point/maxsafeint.png">
+<meta property="og:image" content="https://genuifx.github.io/images/float%20point/maxsafeintsn.png">
+<meta property="og:image" content="https://genuifx.github.io/images/float%20point/maxsafeintn.png">
+<meta property="og:image" content="https://genuifx.github.io/images/float%20point/maxsafecalc.png">
+<meta property="og:image" content="https://genuifx.github.io/images/float%20point/NaN.png">
+<meta property="og:image" content="https://genuifx.github.io/images/float%20point/Infinity.png">
+<meta property="og:updated_time" content="2018-04-18T10:44:09.831Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="关于Javascript的Number类型，你需要知道的东西">
-<meta name="twitter:description" content="原文地址： https://medium.com/dailyjs/javascripts-number-type-8d59199db1b6 为什么0.1+0.2不等于0.3， 而9007199254740992 等于 9007199254740993  大多数静态语言的数字都有不同的数据类型，比方说你想保存一个在[-128; 127]之间的整数，C语言你可以用char，Java可以用byte，他">
-<meta name="twitter:image" content="http://yoursite.com/images/float%20point/1-wrong.png">
+<meta name="twitter:description" content="关于Javascript的Number类型，你需要知道所有的东西都在这里！浮点数如何表示？为什么0.1+0.2不等于0.3？9007199254740992 为什么等于 9007199254740993， 不是道德的沦丧，也不是人性的扭曲！">
+<meta name="twitter:image" content="https://genuifx.github.io/images/float%20point/1-wrong.png">
 
 
 
 
 
 
-  <link rel="canonical" href="http://yoursite.com/2018/04/17/here-is-what-you-need-to-know-about-javasciprt-number-type/"/>
+  <link rel="canonical" href="https://genuifx.github.io/2018/04/17/here-is-what-you-need-to-know-about-javasciprt-number-type/"/>
 
 
 
@@ -329,7 +330,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/17/here-is-what-you-need-to-know-about-javasciprt-number-type/">
+    <link itemprop="mainEntityOfPage" href="https://genuifx.github.io/2018/04/17/here-is-what-you-need-to-know-about-javasciprt-number-type/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="iveswen">
@@ -391,6 +392,8 @@
 
           
 
+          
+              <div class="post-description">关于Javascript的Number类型，你需要知道所有的东西都在这里！浮点数如何表示？为什么0.1+0.2不等于0.3？9007199254740992 为什么等于 9007199254740993， 不是道德的沦丧，也不是人性的扭曲！</div>
           
 
         </div>
@@ -545,6 +548,12 @@
 
     <footer class="post-footer">
       
+        <div class="post-tags">
+          
+            <a href="/tags/Javascript，Float-Point/" rel="tag"># Javascript，Float Point</a>
+          
+        </div>
+      
 
       
       
@@ -669,7 +678,9 @@
                     
                       
                     
-                    <span class="site-state-item-count">2</span>
+                      
+                    
+                    <span class="site-state-item-count">3</span>
                     <span class="site-state-item-name">tags</span>
                   
                 </div>
@@ -880,7 +891,7 @@
   
     <script type="text/javascript">
       var disqus_config = function () {
-        this.page.url = 'http://yoursite.com/2018/04/17/here-is-what-you-need-to-know-about-javasciprt-number-type/';
+        this.page.url = 'https://genuifx.github.io/2018/04/17/here-is-what-you-need-to-know-about-javasciprt-number-type/';
         this.page.identifier = '2018/04/17/here-is-what-you-need-to-know-about-javasciprt-number-type/';
         this.page.title = '关于Javascript的Number类型，你需要知道的东西';
       };

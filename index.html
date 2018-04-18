@@ -101,7 +101,7 @@
 
   <meta property="og:type" content="website">
 <meta property="og:title" content="Genuifx">
-<meta property="og:url" content="http://yoursite.com/index.html">
+<meta property="og:url" content="https://genuifx.github.io/index.html">
 <meta property="og:site_name" content="Genuifx">
 <meta property="og:locale" content="zh-Hans">
 <meta name="twitter:card" content="summary">
@@ -112,7 +112,7 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/"/>
+  <link rel="canonical" href="https://genuifx.github.io/"/>
 
 
 
@@ -290,7 +290,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/17/here-is-what-you-need-to-know-about-javasciprt-number-type/">
+    <link itemprop="mainEntityOfPage" href="https://genuifx.github.io/2018/04/17/here-is-what-you-need-to-know-about-javasciprt-number-type/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="iveswen">
@@ -370,130 +370,14 @@
 
       
         
-          
-            <blockquote>
-<p>原文地址： <a href="https://medium.com/dailyjs/javascripts-number-type-8d59199db1b6" target="_blank" rel="external">https://medium.com/dailyjs/javascripts-number-type-8d59199db1b6</a></p>
-<p>为什么0.1+0.2不等于0.3， 而9007199254740992 等于 9007199254740993</p>
-</blockquote>
-<p>大多数静态语言的数字都有不同的数据类型，比方说你想保存一个在<code>[-128; 127]</code>之间的整数，<code>C</code>语言你可以用<code>char</code>，<code>Java</code>可以用<code>byte</code>，他们都占用一个字节。如果你要存储一个大的数字，你可以使用4字节的<code>int</code>或者8字节的<code>long</code>。这些语言对带小数的数字同样有其特殊的数据类型，譬如4字节的<code>float</code>和8字节的<code>double</code>。这两种类型一般都称为浮点类型，后面我们会知道这个名字的缘来。</p>
-<p>但是在<code>Javascript</code>中，我们没有那么多的类型。根据ECMAScript标准，数字只有一种类型，即双精度，64位二进制，符合IEEE 754格式的值。这种类型和C与Java的double类型一样，用于存储整数和小数。一些js的开发者没有意识到这一点，于是觉得<code>1</code>是这样存储的：</p>
-<p><img src="/images/float point/1-wrong.png" alt=""></p>
-<p>然而，实际上是存成这样子的：</p>
-<p><img src="/images/float point/1-right.png" alt=""></p>
-<p>这个误解可能引起很大的困惑，比方说下面这个Java的循环</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">for</span> (<span class="keyword">int</span> i=<span class="number">1</span>; <span class="number">1</span>/i &gt; <span class="number">0</span>; i++) &#123;</div><div class="line">    System.out.println(<span class="string">"Count is: "</span> + i);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>我们很容易知道它是怎么结束循环的，第二次循环迭代的是会后<code>i</code>变成<code>2</code>，然后<code>1/2</code>等于<code>0.5</code>,因为是int类型，结果被截断为<code>0</code>。循环结束。</p>
-<p>现在想象下同样的循环跑在Javascript下：</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">for</span> (<span class="keyword">var</span> i=<span class="number">1</span>; <span class="number">1</span>/i &gt; <span class="number">0</span>; i++) &#123;</div><div class="line">    <span class="built_in">console</span>.log(<span class="string">"Count is: "</span> + i);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>这是个死循环(╯﹏╰)，因为<code>1/i</code>不会得到一个整数，而是一个浮点数。想知道为啥不，继续往下阅读把💯</p>
-<p>另外一个不熟悉Javascript的人会经常提的问题是0.1加0.2等于<code>0.30000000000000004</code>, 这意味着0.1加0.2不等于0.3。stackoverflow上面有许多这个现象的问题：</p>
-<p><img src="/images/float point/stackoverflow.png" alt=""></p>
-<p>有意思的是，这个问题总是跟Javascript出现，实际上任何使用浮点数的语言都会有这个问题，也就是说，要是你在C或者Java里面用float和double类型，结果是一样的。另外有趣的是0.1+0.2其实不等于浏览器打印的<code>0.30000000000000004</code>，而是<code>0.3000000000000000444089209850062616169452667236328125</code>。</p>
-<p>所以本文将会详细解释浮点数，而作为示例会试着分析上述的for循环和0.1+0.2现象。</p>
-<h2 id="使用科学计数法表示数字"><a href="#使用科学计数法表示数字" class="headerlink" title="使用科学计数法表示数字"></a>使用科学计数法表示数字</h2><p>在开始浮点数讲解之前，我们先了解下科学计数法，一般表示为一下形式：</p>
-<p><img src="/images/float point/scientificNotation.png" alt=""></p>
-<p>significant表示数字重要的数值部分，一般称之为尾数或者精度。尾数不包括0，0只是占位作用。Base则指定了数字系统的基数，如10进制的基数是10，二进制的基数是2。Exponent则决定了小数点要往左或者往右移动几位。</p>
-<p>所有的数字都可以用科学计数法表示比方说：</p>
-<p><img src="/images/float point/snexample.png" alt=""></p>
-<p>指数为0意味着小数点不需要移动。<code>0.00000022</code>表示如下：</p>
-<p><img src="/images/float point/snexample2.png" alt=""></p>
-<p>转化之后，我们就可以重新定义每个数字的部分了：</p>
-<p><img src="/images/float point/snexample3.png" alt=""></p>
-<p>规范化科学计数法：</p>
-<p><img src="/images/float point/snnormallized.png" alt=""></p>
-<p>科学计数法可以理解为数字的浮点表示。“浮点”本来就意味着数字的小数点是可以浮动的。<br>另外根据科学计数法的特点我们会知道，规范化的科学计数写法对二进制数字来说，整数永远都是1。</p>
-<h2 id="IEEE-754浮点数"><a href="#IEEE-754浮点数" class="headerlink" title="IEEE 754浮点数"></a>IEEE 754浮点数</h2><p>IEEE 754定义了很多关于浮点的运算，现在我们只对数字的存储，四舍五入和相加感兴趣。四舍五入是一个很频繁的操作，一般发生在选定的格式不够保存数字的时候。另外一篇文章有详细讲解<a href="https://medium.com/@maximus.koretskyi/how-to-round-binary-fractions-625c8fa3a1af#.e9nykp8sj" target="_blank" rel="external">二进制的四舍五入</a>。了解其中的机制非常的重要。</p>
-<p>现在我们来看看数字是怎么保存的吧~</p>
-<h3 id="理解数字的存储"><a href="#理解数字的存储" class="headerlink" title="理解数字的存储"></a>理解数字的存储</h3><p>标准规定的格式里面，最常用的是单精度和双精度两种。两者不同的地方在于占用的字节数和能表示的数字范围。将一个科学计数法表示的数字转化为IEEE754格式的算法适用于单精度和双精度，他们只是尾数和指数部分的位数不一样。</p>
-<p>IEEE754浮点数分符号位，尾数和指数。双精度的格式是这么分配的（Javascript的数字类型）：</p>
-<p><img src="/images/float point/fp.png" alt=""></p>
-<p>标志位1位，11位的指数以及52位的尾数。用表格这么表示：</p>
-<p><img src="/images/float point/fptable.png" alt=""></p>
-<p>指数使用偏移二进制存储，另一篇<a href="https://medium.com/@maximus.koretskyi/the-mechanics-behind-exponent-bias-in-floating-point-9b3185083528#.zacphtue3" target="_blank" rel="external">文章</a>有详细的讲解</p>
-<h3 id="整数是如何存储的"><a href="#整数是如何存储的" class="headerlink" title="整数是如何存储的"></a>整数是如何存储的</h3><p>来看看<code>1</code>是怎么表示<br>首先用科学计数法表示如下：</p>
-<p><img src="/images/float point/1.png" alt=""></p>
-<p>这样子我们便知道尾数是<code>1</code>，指数是0。得到这个信息之后，你可能觉得浮点表示如下：</p>
-<p><img src="/images/float point/1-wrong.png" alt=""></p>
-<p>事实如何呢？Javascript没有内置的函数可以直接让你看到数字的存储的位模式。于是我写了一个函数来打印数字的存储方式（在不考虑大小端的情况下。</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">to64bitFloat</span>(<span class="params">number</span>) </span>&#123;</div><div class="line">    <span class="keyword">var</span> i, result = <span class="string">""</span>;</div><div class="line">    <span class="keyword">var</span> dv = <span class="keyword">new</span> <span class="built_in">DataView</span>(<span class="keyword">new</span> <span class="built_in">ArrayBuffer</span>(<span class="number">8</span>));</div><div class="line"></div><div class="line">    dv.setFloat64(<span class="number">0</span>, number, <span class="literal">false</span>);</div><div class="line"></div><div class="line">    <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; <span class="number">8</span>; i++) &#123;</div><div class="line">        <span class="keyword">var</span> bits = dv.getUint8(i).toString(<span class="number">2</span>);</div><div class="line">        <span class="keyword">if</span> (bits.length &lt; <span class="number">8</span>) &#123;</div><div class="line">            bits = <span class="keyword">new</span> <span class="built_in">Array</span>(<span class="number">8</span> - bits.length).fill(<span class="string">'0'</span>).join(<span class="string">""</span>) + bits;</div><div class="line">        &#125;</div><div class="line">        result += bits;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">return</span> result;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>调用这个函数，你就会知道<code>1</code>是这样存储的：</p>
-<p><img src="/images/float point/1-right.png" alt=""></p>
-<p>跟想象中的完全不一样啊，尾数部分没有数字，指数部分有很多1。为啥会这样呢？首先我们得知道所有数字都是从规范化的科学计数写法转化过来的。这么做有什么好处呢？如果小数点左边的数字永远是1的话，那么就不用浪费一位去保存它了，只需要在执行数学运算的时候，硬件把这个1补回来即可。因为<code>1</code>的小数点右边没有其他数，所以尾数部分我们没有东西可以保存，全是0。</p>
-<p>现在看看指数部分的1是怎么来的。如上述提到的指数存储的偏移二进制，计算如下：</p>
-<p><img src="/images/float point/offsetbinary.png" alt=""></p>
-<p>可以看到这就是上述表示中的值，所以<code>0</code>在偏移二进制的确是这么保存的。如果还不清楚的话，可以查看我的另外一篇<a href="https://medium.com/@maximus.koretskyi/the-mechanics-behind-exponent-bias-in-floating-point-9b3185083528#.2q5qxmdn3" target="_blank" rel="external">文章</a>。</p>
-<p>现在让我们尝试用上面学到的东西来试着对<code>3</code>进行浮点表示把。二进制中3表示为<code>11</code>，规范化之后就是：</p>
-<p><img src="/images/float point/3n.png" alt=""></p>
-<p>小数点之后只有一个数字是1，上述可知小数点右边的1是不存储的，同时根据规范化的结果可以知道指数部分是<code>1</code>。接着算一下<code>1</code>的偏移二进制怎么表示吧：</p>
-<p><img src="/images/float point/1offsetbinary.png" alt=""></p>
-<p>另外一点需要注意的是，尾数部分数字按照科学计数法的表示的顺序放置–即从小数点开始从左到右依序填入。综上所述，用浮点数表示3为：</p>
-<p><img src="/images/float point/3fp.png" alt=""></p>
-<p>用我前面提供的函数会得到一样的结果哦。</p>
-<h3 id="为什么0-1-0-2不等于0-3"><a href="#为什么0-1-0-2不等于0-3" class="headerlink" title="为什么0.1+0.2不等于0.3"></a>为什么0.1+0.2不等于0.3</h3><p>既然我们知道数字是如何保存的，接下来讨论下这个经典的问题。标准的解答如下：</p>
-<blockquote>
-<p>二进制里面带分母的分数只有2的倍数才能被有限的表示。因为0.1的分母是10，0.2的分母是5都不是2的倍数，所以这些数字不能被有限小数表示。为了以IEEE 754浮点数保存这些小数，不得不把这些尾数进行四舍五入，半进度的10位，单精度的23位，双精度的52位。根据不同的精度位数，浮点数会把0.1和0.2转化比其数学表示大或者小的数。正因为如此0.1+0.2总是不等于0.3</p>
-</blockquote>
-<p>这个解释对一些开发者来说已经够了，但更好的方式是搞清楚底层到底发生了什么。这就是我们现在要做的事情。</p>
-<h3 id="将0-1和0-2进行浮点表示"><a href="#将0-1和0-2进行浮点表示" class="headerlink" title="将0.1和0.2进行浮点表示"></a>将0.1和0.2进行浮点表示</h3><p>先看看0.1的浮点表示。首先需要做的事是转化0.1为二进制，一直乘以2即可：</p>
-<p><img src="/images/float point/0.1c.png" alt=""></p>
-<p>接着用规范化的科学计数法表示它：</p>
-<p><img src="/images/float point/0.1sn.png" alt=""></p>
-<p>由于尾数只有52位，于是我们得把无限循环的小数做四舍五入</p>
-<p><img src="/images/float point/0.1round.png" alt=""></p>
-<p>最后一件事，计算-4的偏移二进制表示：</p>
-<p><img src="/images/float point/0.1offset.png" alt=""></p>
-<p>于是0.1的浮点表示为：</p>
-<p><img src="/images/float point/0.1fp.png" alt=""></p>
-<p>0.2的浮点表示建议自己实践下哈~</p>
-<p><img src="/images/float point/0.2fp.png" alt=""></p>
-<h3 id="计算0-1-0-2的结果"><a href="#计算0-1-0-2的结果" class="headerlink" title="计算0.1+0.2的结果"></a>计算0.1+0.2的结果</h3><p>将上述数字从浮点表示转为科学计数法表示的话，得下面的结果：</p>
-<p><img src="/images/float point/0.10.2sn.png" alt=""></p>
-<p>要将两数相加的话，需要先将指数部分转为相等。</p>
-<p><img src="/images/float point/0.1sn2.png" alt=""></p>
-<p>相加可得：</p>
-<p><img src="/images/float point/add.png" alt=""></p>
-<p>我们需要用浮点表示了相加的结果，所以接下来只需要将他规范化，四舍五入（如果需要的话），计算偏移二进制即可：</p>
-<p><img src="/images/float point/0.3calc.png" alt=""></p>
-<p>规范化之后发现超过52位了，我们需要做一次四舍五入：</p>
-<p><img src="/images/float point/resultround.png" alt=""></p>
-<p>最终的浮点表示为：</p>
-<p><img src="/images/float point/resultfp.png" alt=""></p>
-<p>这就是当你计算0.1+0.2的时候保存的准确结果。为了得到这个结果，计算机做三次四舍五入，保存每个数字各一次，保存结果一次。而单纯的保存0.3的时候，只做了一次四舍五入。正是四舍五入导致了0.1+0.2的结果跟0.3的表示不一致。当Javascript执行<code>0.1+0.2===0.3</code>的时候，实际上做了按位比较，因为结果不同，自然就返回false了。而0.1和0.2在二进制中不用被有限表示，四舍五入总是存在，故0.1+0.2永远都不会等于0.3。</p>
-<h3 id="为什么for循环会停不下来？"><a href="#为什么for循环会停不下来？" class="headerlink" title="为什么for循环会停不下来？"></a>为什么<code>for</code>循环会停不下来？</h3><p>理解for循环为什么死循环的关键是<code>9007199254740991</code>。这个数字非常的特殊，以至于他有自己的常量表示，下面是EcmaScript标准关于其的描述：</p>
-<blockquote>
-<p><code>Number.MAX_SAFE_INTEGER</code>是一个最大的数字n以至于n+1都可以准确表示一个数字值。<code>Number.MAX_SAFE_INTEGER</code>等于9007199254740991（2⁵³−1）</p>
-</blockquote>
-<p>MDN是这么解释的：</p>
-<blockquote>
-<p>常量中的safe指的是能准确表示和比较的整数，譬如<code>Number.MAX_SAFE_INTEGER + 1 === Number.MAX_SAFE_INTEGER + 2</code>会得到true，而这从数理角度是不对的。</p>
-</blockquote>
-<p>首先需要明确的一点是，它不是js能表示的最大的数，比如数字<code>9007199254740994</code>即<code>MAX_SAFE_INTEGER + 3</code>也能被安全的表示。如果要找最大能表示的数字的话，因为用<code>Number.MAX_VALUE</code>（等于<code>1.7976931348623157e+308</code>）这个常量。令人惊讶的是，在<code>MAX_SAFE_INTEGER</code>和<code>MAX_VALUE</code>之间有许多数字不能被表示。实际上在<code>MAX_SAFE_INTEGER</code>和<code>MAX_SAFE_INTEGER+3</code>之间就有一个数字不能被表示：<code>9007199254740993</code>。如果你把这个数输入console中，你会发现它等于<code>9007199254740992</code>。</p>
-<p>为了理解到底发生了什么，我们先看看<code>9007199254740991 (MAX_SAFE_INTEGER)</code>的浮点表示：</p>
-<p><img src="/images/float point/maxsafeint.png" alt=""></p>
-<p>转为科学计数法表示为：</p>
-<p><img src="/images/float point/maxsafeintsn.png" alt=""></p>
-<p>右移小数点52位得：</p>
-<p><img src="/images/float point/maxsafeintn.png" alt=""></p>
-<p>也就是为了保存<code>MAX_SAFE_INTEGER</code>，指数为52的情况下，我们用光了尾数所有的位数来表示它。由于所有位都被用了，要表示更大的数字只能把指数增加1。指数变为<code>53</code>的话，我们得把小数点右移53位，由于尾数只有52位，我们只能在最后添加<code>0</code>补充了,所以指数<code>54</code>就需要补2个0，<code>55</code>就要3个，依次类推。</p>
-<p>这会有什么影响呢，也许你已经猜到了。由于所有大于<code>MAX_SAFE_INTEGER</code>的数，我们会以0结尾，那就意味着没有奇数能被浮点表示了！</p>
-<p><img src="/images/float point/maxsafecalc.png" alt=""></p>
-<p>能看到<code>9007199254740993</code>和<code>9007199254740993</code>都不能被64位的浮点数表示。如果你继续试下去便会发现不能表示的数字会有偶数出现！而随着指数的增加，不能表示的范围会越来越大！</p>
-<h3 id="死循环"><a href="#死循环" class="headerlink" title="死循环"></a>死循环</h3><p>再看看<code>for</code>循环：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">for</span> (<span class="keyword">var</span> i=<span class="number">1</span>; <span class="number">1</span>/i &gt; <span class="number">0</span>; i++) &#123;</div><div class="line">    <span class="built_in">console</span>.log(<span class="string">"Count is: "</span> + i);</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<p>它不会停下来，上面提到了以为<code>1/i</code>的结果不是一个整数，而是浮点数。现在你已经知道浮点数和<code>Number.MAX_SAFE_INTEGER</code>了，应该很容易理解为啥它不会停止循环。</p>
-<p>如果要循环结束的话，只有<code>i</code>必须变成<code>Infinity</code>， 因为<code>1/Infinity &gt; 0</code> 是<code>false</code>。 当然这永远不会发生。上面的章节我解释了为啥一些数字不能被表示，以及他们被四舍五入为最近可表达的偶数。当i增加到<code>9007199254740993</code>的时候(也就是<code>MAX_SAFE_INTEGER+2</code>)，由于最后一位数字无法表示，于是只能四舍五入到<code>9007199254740992</code>。于是循环便卡在这两个数字之间了。</p>
-<h2 id="关于NaN和Infinity的几句话"><a href="#关于NaN和Infinity的几句话" class="headerlink" title="关于NaN和Infinity的几句话"></a>关于<code>NaN</code>和<code>Infinity</code>的几句话</h2><p>我决定对<code>NaN</code>和<code>Infinity</code>做一点简述作为文章的结束。<code>NaN</code>意味着<code>Not a Number</code>，它和<code>Infinity</code>不一样，尽管他们都被当初浮点操作的特殊例子去处理。它们的指数是<code>1024</code>（即<code>11111111111</code>），而<code>Number.MAX_VALUE</code>的指数是<code>1023</code>（即<code>111111111101</code>）。</p>
-<p>由于<code>NaN</code>是用浮点表示的，所以当你看到<code>typeof NaN</code>返回<code>number</code>的时候，应该不会惊讶了吧。哦，对了，它的尾数有一个1：</p>
-<p><img src="/images/float point/NaN.png" alt=""></p>
-<p>有许多数学操作都会得到<code>NaN</code>的结果，例如<code>0/0</code>或者<code>Math.sqrt(-4)</code>。Javascript中有一些函数也会返回<code>NaN</code>，譬如<code>parseInt</code>。而有意思的地方是，所有和<code>NaN</code>的比较操作都会返回<code>false</code>。例如下面的操作都会得到<code>false</code>：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="literal">NaN</span> === <span class="literal">NaN</span></div><div class="line"><span class="literal">NaN</span> &gt; <span class="literal">NaN</span></div><div class="line"><span class="literal">NaN</span> &lt; <span class="literal">NaN</span></div><div class="line"></div><div class="line"><span class="literal">NaN</span> &gt; <span class="number">3</span></div><div class="line"><span class="literal">NaN</span> &lt; <span class="number">3</span></div><div class="line"><span class="literal">NaN</span> === <span class="number">3</span></div></pre></td></tr></table></figure></p>
-<p>只有<code>NaN</code>是不等于自身的，要检查一个值是不是<code>NaN</code>的话，得调用<code>isNaN</code>函数。</p>
-<p><code>Infinity</code>则是另外一个浮点表示中设计来用处理溢出和一些数学操作的特殊用例，譬如<code>1/0</code>。<code>Infinity</code>表示如下：</p>
-<p><img src="/images/float point/Infinity.png" alt=""></p>
-<p>正的<code>Infinity</code>符号位是0，负的<code>Infinity</code>是1。MDN有一篇<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Infinity" target="_blank" rel="external">文章</a>介绍了一些得到<code>Infinity</code>的操作。和<code>NaN</code>不同的是，<code>Infinity</code>可以很安全的用于比较操作。</p>
-<blockquote>
-<p>原文地址： <a href="https://medium.com/dailyjs/javascripts-number-type-8d59199db1b6" target="_blank" rel="external">https://medium.com/dailyjs/javascripts-number-type-8d59199db1b6</a></p>
-</blockquote>
-
-          
+          关于Javascript的Number类型，你需要知道所有的东西都在这里！浮点数如何表示？为什么0.1+0.2不等于0.3？9007199254740992 为什么等于 9007199254740993， 不是道德的沦丧，也不是人性的扭曲！
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2018/04/17/here-is-what-you-need-to-know-about-javasciprt-number-type/">
+              Read more &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -545,7 +429,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/12/from-promise-polyfill-to-event-loop-2/">
+    <link itemprop="mainEntityOfPage" href="https://genuifx.github.io/2018/04/12/from-promise-polyfill-to-event-loop-2/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="iveswen">
@@ -625,71 +509,14 @@
 
       
         
-          
-            <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>在<a href="../from-promise-polyfill-to-eventloop">上一章</a>我们提出了一个promise和setTimeout回调执行顺序的疑问，并且一起研究了promise-polyfill的源码实现。然而，最初的问题还是没有得到解答，同时引出了更多的关于异步时序的思考，为了真正解决这个问题，我们必须深入理解一些js实现底层的东西。</p>
-<h2 id="热身"><a href="#热身" class="headerlink" title="热身"></a>热身</h2><p>我们从下面这张经典图解开始了解，（引用自<a href="http://vimeo.com/96425312" title="Robert" target="_blank" rel="external">Robert</a>）<br><img src="/images/eventloop/model.png" alt="js模型图" title="js模型图"></p>
-<p>这是一张js实现的模型图，请注意我的措辞“js实现”；实际上ecmascript并没有规定任何Event Loop的实现内容（划重点），如果去搜v8的源码，你会发现上图右边的web api实现都找不到，不管是XMLHttpRequest还是setTimeout的实现，我们都找不到出处。</p>
-<p>原因很简单，web api 或者说 BOM，DOM这些都不是ecma的语言规范。</p>
-<p>图中的内容老生常谈了，几乎每个js教程关于Event Loop都会挂这个，但还是稍微介绍一下：</p>
-<h3 id="1-heap（堆）"><a href="#1-heap（堆）" class="headerlink" title="1. heap（堆）"></a>1. heap（堆）</h3><p>用于分配对象，对象名实际上一个指向一堆无结构的内存区域（同C语言的结构体？），需要注意的是，当我们形成闭包的时候，实际上作用域链也是保存到堆了。</p>
-<h3 id="2-stack（栈）"><a href="#2-stack（栈）" class="headerlink" title="2. stack（栈）"></a>2. stack（栈）</h3><p>函数调用栈，当调用一个函数的时候，我们把函数入栈，当函数执行完毕，则从当前栈中弹出函数，并且继续执行下一个函数。javascript是单线程的语言主要是提现在这里，因为一个“thread”只有一个调用栈，所以一个时间片下永远都只能“专心”处理一件事，调用栈同样有调用深度的限制，一个无限循环自我调用的函数会把栈搞爆。<br><img src="/images/eventloop/1_tqkykdU69DFrxi82JOWLbQ.png" alt=""></p>
-<blockquote>
-<p>引用自Medium</p>
-</blockquote>
-<h3 id="3-Event-Loop"><a href="#3-Event-Loop" class="headerlink" title="3. Event Loop"></a>3. Event Loop</h3><p>一个不断执行的循环，不断的从任务队列或者说消息队列读取需要执行的回调函数，当函数执行的时候，会执行入栈操作<br>所有例如<code>setTimeout(fn, 0)</code>这种操作并不能保证当前函数执行完了之后马上就运行，会有排队的延迟。zakas在<a href="https://www.nczonline.net/blog/2011/09/19/script-yielding-with-setimmediate/" target="_blank" rel="external">这篇文章</a>中还提到了timer的解析和耗电问题💯<br>Event Loop的实现一般看起来长这样：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">while</span> (queue.waitForMessage()) &#123;</div><div class="line">  queue.processNextMessage();</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<p>ok，热身完毕，正餐开始。</p>
-<h2 id="并发模型和事件循环"><a href="#并发模型和事件循环" class="headerlink" title="并发模型和事件循环"></a>并发模型和事件循环</h2><h3 id="以“Thread”为单位"><a href="#以“Thread”为单位" class="headerlink" title="以“Thread”为单位"></a>以“Thread”为单位</h3><p>我们常说javascript是单线程语言，首先需要明确一点的是上述的heap，stack和Event Loop都在一个“thread”下执行，对于chrome来说，每个window（页面窗口）就是一个“thread”，所以只有同一个“thread”下面的函数或者对象才能相互交流，而web worker和非同源的iframe都有自己独有的thread，相互之间并不能直接交流。</p>
-<h3 id="Event-Loop-依赖js宿主环境实现"><a href="#Event-Loop-依赖js宿主环境实现" class="headerlink" title="Event Loop 依赖js宿主环境实现"></a>Event Loop 依赖js宿主环境实现</h3><p>ecma的spec并没有规定Event Loop应该怎么设计，这就决定了在不同的浏览器，不同的宿主环境（node，嵌入式）其Event Loop的实现不同，表现也不禁相同。</p>
-<p>故而，promise与setTimeout的回调执行先后问题，实际上在不同浏览器不同版本运行结果都不相同。而由于没有规范规定实现，所有你不能说某个浏览器的是错误的，只能说哪种实现更为合理（当然现代浏览器的实现已经趋于一致。<br><img src="/images/eventloop/WX20180327-233228.png" alt=""></p>
-<blockquote>
-<p>同一份代码在不同浏览器的运行结果, 引用自<a href="https://jakearchibald.com/2015/tasks-microtasks-queues-and-schedules/" target="_blank" rel="external">jake</a></p>
-</blockquote>
-<h3 id="Event-Loop-是类似队列（queue-like）的结构"><a href="#Event-Loop-是类似队列（queue-like）的结构" class="headerlink" title="Event Loop 是类似队列（queue-like）的结构"></a>Event Loop 是类似队列（queue-like）的结构</h3><p>对node来说，Event Loop不是一个单纯的队列，而是由一个个Phase和Tick组成，每个Phase和Tick又有自己的任务队列。详见下文。<br>对chrome来说，Event Loop又分为Task（又叫MarcoTask）和MicroTask，各有自己任务队列，详见下文。<br>其他浏览器的资料由于闭源，网上没有找到相关资料，但是从表现上看估计实现差不多。如果有相关的信息欢迎分享链接。<br>故而，Event Loop从宏观的角度看的确是一个依次执行任务队列，但从微观实现而言并非简单的队列便万事大吉。</p>
-<h3 id="Ecma-262的Jobs和Job-Queues"><a href="#Ecma-262的Jobs和Job-Queues" class="headerlink" title="Ecma-262的Jobs和Job Queues"></a>Ecma-262的Jobs和Job Queues</h3><p>上面我们说过，ecma并没有Event Loop的规范，但是如果读过ecma-262的spec的同学就会发现，在<a href="http://www.ecma-international.org/ecma-262/6.0/#sec-jobs-and-job-queues" target="_blank" rel="external">8-4</a>有一个神奇的Jobs和Job Queues章节，被光速打脸了吗？不存在的</p>
-<p>ecma的Jobs实际上为promise定义了标准实现。由于在es6，promise已经成为了语言标准之一，而ecma的引擎需要不依赖宿主实现promise，例如V8能够脱离浏览器单独运行，在没有浏览器webApi支持的情况下依然要支持promise实现。所以spec里面有这边规定并不奇怪。</p>
-<p>所以Jobs Queues和Event Loop实际上是两个东西，那么当V8在chrome运行的时候，就会有一个问题，promise的回调应该在哪里运行？<br>如果在V8，Event Loop将无法知道捕获promise相关任务，二者并不能协调工作。<br>如果在Event Loop，必须覆盖了V8的相关实现。<br>于是Html5规范规定了宿主环境必须覆盖实现ecma的Job Queues，也是就是说在浏览器环境实际上promise的回调处理由Event Loop接手。<br><img src="/images/eventloop/html5spec.jpg" alt=""></p>
-<h2 id="Chrome的Task和MicroTask"><a href="#Chrome的Task和MicroTask" class="headerlink" title="Chrome的Task和MicroTask"></a>Chrome的Task和MicroTask</h2><p>Tasks一般被设计为浏览器能够介入其执行间歇，以便响应用户的操作，刷新UI，不管是页面的点击或者滚动事件，如果执行栈被阻塞的了，用户将会感觉到明显的卡顿。<br><img src="/images/eventloop/1_MCt4ZC0dMVhJsgo1u6lpYw.jpeg" alt=""></p>
-<p>MicroTask一般则为了快速响应回调处理，如果当前调用栈没有其他执行函数的话，就会尽快的按照顺序调用对应回调，所以如果当前上下文已经没有待处理函数，或者两个Task之间的间歇都会执行MicroTask。值得注意的是，如果当前执行的MicroTask又动态添加了一个MicroTask的话，新的MicroTask会在这个周期内马上执行~</p>
-<h3 id="类型"><a href="#类型" class="headerlink" title="类型"></a>类型</h3><p>属于Task的的回调类型有： <code>setTimeout</code>，<code>XMLHttpRequest</code>， <code>IndexDB</code>，<code>事件IO</code>，<code>postMessage</code><br>属于MicroTask的回调类型有：<code>Promise</code>，<code>MutationObserver</code></p>
-<h3 id="执行规则"><a href="#执行规则" class="headerlink" title="执行规则"></a>执行规则</h3><ol>
-<li>Task回调按照顺序一个个执行，每个Task之间允许浏览器进行UI渲染</li>
-<li>MicroTask回调按照顺序一个个执行，并且有以下执行时机</li>
-</ol>
-<p>关于chrome的Task和MicroTask主要从jake大大（google chrome技术支持）的<a href="https://jakearchibald.com/2015/tasks-microtasks-queues-and-schedules/" target="_blank" rel="external">文章</a>中了解到，如果有大佬对这方面有更深入的了解的话，评论，rtx求指教！！！</p>
-<h2 id="node的Libuv"><a href="#node的Libuv" class="headerlink" title="node的Libuv"></a>node的Libuv</h2><p>同chrome，node也是使用V8引擎编译，解释ecma的语法。如果你认真看了前文，就知道node需要实现自己的EventLoop机制，以保证单线程的js能以异步方式处理并发事务。</p>
-<p>node的Event Loop实现全部在<a href="http://nikhilm.github.io/uvbook/introduction.html#background" target="_blank" rel="external">Libuv</a></p>
-<blockquote>
-<p>The node.js project began in 2009 as a JavaScript environment decoupled from the browser. Using Google’s V8 and Marc Lehmann’s libev, node.js combined a model of I/O – evented – with a language that was well suited to the style of programming; due to the way it had been shaped by browsers. As node.js grew in popularity, it was important to make it work on Windows, but libev ran only on Unix. The Windows equivalent of kernel event notification mechanisms like kqueue or (e)poll is IOCP. libuv was an abstraction around libev or IOCP depending on the platform, providing users an API based on libev. In the node-v0.9.0 version of libuv libev was removed.</p>
-</blockquote>
-<p>一开始的node.js实现并不支持window环境，后来用户越来越多了，需要支持window环境，但是原来的libev又不支持，于是大佬们便自己整了一个libuv，实现了node自己的事件循环机制，抹平了底层差异，对Module提供统一的api。</p>
-<p>当实例化一个node应用的时候，libuv会初始化一个线程池用于处理一些没有操作系统API支持的异步事件。也就是说libuv并非独立于js运行时，他和V8应该在一个线程下工作，异步IO处理也并非都在单独线程，libuv会优先使用系统提供API进行处理。</p>
-<p><img src="/images/eventloop/nodejs-EventLoop.jpg" alt=""></p>
-<h3 id="Libuv的Event-Loop"><a href="#Libuv的Event-Loop" class="headerlink" title="Libuv的Event Loop"></a>Libuv的Event Loop</h3><p>Libuv的Event Loop和chrome的类似，分为<em><code>phase</code></em>和<em><code>tick</code></em>，phase又有细分的种类，tick跟MicroTask类似，用于执行需要在当前运行时执行完毕后马上执行的事件回调，例如<code>promise</code>, <code>process.nextTick</code></p>
-<p><img src="/images/eventloop/node-event-loop.png" alt=""></p>
-<p><a href="https://nodejs.org/en/docs/guides/event-loop-timers-and-nexttick/" target="_blank" rel="external">nodejs官方示例</a>：<br>   ┌───────────────────────┐<br>┌─&gt;│        timers         │<br>│  └──────────┬────────────┘<br>│  ┌──────────┴────────────┐<br>│  │     I/O callbacks     │<br>│  └──────────┬────────────┘<br>│  ┌──────────┴────────────┐<br>│  │     idle, prepare     │<br>│  └──────────┬────────────┘      ┌───────────────┐<br>│  ┌──────────┴────────────┐      │   incoming:   │<br>│  │         poll          │&lt;─────┤  connections, │<br>│  └──────────┬────────────┘      │   data, etc.  │<br>│  ┌──────────┴────────────┐      └───────────────┘<br>│  │        check          │<br>│  └──────────┬────────────┘<br>│  ┌──────────┴────────────┐<br>└──┤    close callbacks    │<br>   └───────────────────────┘</p>
-<p>libuv会循环的执行执行每个phase的相应队列，FIFO原则。</p>
-<h3 id="分类"><a href="#分类" class="headerlink" title="分类"></a>分类</h3><h4 id="Timer"><a href="#Timer" class="headerlink" title="Timer"></a>Timer</h4><p>所有通过setTimeout，setInterval调度的事件回调都在这里得到处理</p>
-<h3 id="IO-callback"><a href="#IO-callback" class="headerlink" title="IO callback"></a>IO callback</h3><p>绝大部分回调处理的时机，包括http请求引发的回调，文件读写IO回调</p>
-<h3 id="IO-Polling"><a href="#IO-Polling" class="headerlink" title="IO Polling"></a>IO Polling</h3><p>给下一轮循环收集新的事件</p>
-<h3 id="Immediate"><a href="#Immediate" class="headerlink" title="Immediate"></a>Immediate</h3><p>通过setImmediate调度的事件回调处理</p>
-<h3 id="close"><a href="#close" class="headerlink" title="close"></a>close</h3><p>处理所有的.on(‘close’)事件回调</p>
-<h2 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h2><p>综上所述：</p>
-<ol>
-<li>不同的宿主环境实现Event Loop不同</li>
-<li>promise在不同浏览器不同版本执行顺序都有可能不一样，依赖实现</li>
-<li>js是一个单线程语言，依赖异步模型达到并发效果</li>
-<li>代码层面不要让<code>Promise.resolve</code>和<code>setTimeout(fn, 0)</code>竞争执行速度</li>
-</ol>
-<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p>ECMAScript 的 Job Queues 和 Event loop 有什么关系？ - flyingsoul的回答 - 知乎<br><a href="https://www.zhihu.com/question/40063533/answer/271176956" target="_blank" rel="external">https://www.zhihu.com/question/40063533/answer/271176956</a></p>
-<p><a href="http://www.ecma-international.org/ecma-262/6.0/#sec-jobs-and-job-queues" target="_blank" rel="external">Ecma Jobs and Jobs Queues</a></p>
-<p><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/EventLoop" target="_blank" rel="external">Mdn Event Loop</a></p>
-<p><a href="https://medium.com/the-node-js-collection/what-you-should-know-to-really-understand-the-node-js-event-loop-and-its-metrics-c4907b19da4c" target="_blank" rel="external">What you should know to really understand the Node.js Event Loop</a></p>
-<p><a href="https://medium.com/@gaurav.pandvia/understanding-javascript-function-executions-tasks-event-loop-call-stack-more-part-1-5683dea1f5ec" target="_blank" rel="external">https://medium.com/@gaurav.pandvia/understanding-javascript-function-executions-tasks-event-loop-call-stack-more-part-1-5683dea1f5ec</a></p>
-<p><a href="https://stackoverflow.com/questions/10680601/nodejs-event-loop" target="_blank" rel="external">https://stackoverflow.com/questions/10680601/nodejs-event-loop</a></p>
-<p><a href="https://nodejs.org/en/docs/guides/event-loop-timers-and-nexttick/" target="_blank" rel="external">https://nodejs.org/en/docs/guides/event-loop-timers-and-nexttick/</a></p>
-<p><a href="http://nikhilm.github.io/uvbook/introduction.html#background" target="_blank" rel="external">http://nikhilm.github.io/uvbook/introduction.html#background</a></p>
-
-          
+          Javascript的宿主环境是怎么实现Event Loop的？ MicroTask和MacroTask的区别？nodejs的Tick和Phase了解一下~本文从promise-polyfill开始，深入介绍Event Loop的机制
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2018/04/12/from-promise-polyfill-to-event-loop-2/">
+              Read more &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -741,7 +568,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/12/from-promise-polyfill-to-eventloop/">
+    <link itemprop="mainEntityOfPage" href="https://genuifx.github.io/2018/04/12/from-promise-polyfill-to-eventloop/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="iveswen">
@@ -821,40 +648,14 @@
 
       
         
-          
-            <h1 id="一切的开始"><a href="#一切的开始" class="headerlink" title="一切的开始"></a>一切的开始</h1><p>去年某天，t0在群里扔了一道类似下面的题目（不是这道，这道来自<a href="https://jakearchibald.com/2015/tasks-microtasks-queues-and-schedules/" title="jake" target="_blank" rel="external">jake</a>）：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="built_in">console</span>.log(<span class="string">'script start'</span>);</div><div class="line"></div><div class="line">setTimeout(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</div><div class="line">  <span class="built_in">console</span>.log(<span class="string">'setTimeout'</span>);</div><div class="line">&#125;, <span class="number">0</span>);</div><div class="line"></div><div class="line"><span class="built_in">Promise</span>.resolve().then(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</div><div class="line">  <span class="built_in">console</span>.log(<span class="string">'promise1'</span>);</div><div class="line">&#125;).then(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</div><div class="line">  <span class="built_in">console</span>.log(<span class="string">'promise2'</span>);</div><div class="line">&#125;);</div><div class="line"></div><div class="line"><span class="built_in">console</span>.log(<span class="string">'script end'</span>);</div></pre></td></tr></table></figure></p>
-<p>当时大家都说出一个理所应当的答案<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">script start</div><div class="line">script end</div><div class="line">promise1</div><div class="line">promise2</div><div class="line">setTimeout</div></pre></td></tr></table></figure></p>
-<p>然而，有细心的同学把用例放到ie8下面跑的时候就会发现结果有些细小的差异：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">script start</div><div class="line">script end</div><div class="line">setTimeout</div><div class="line">promise1</div><div class="line">promise2</div></pre></td></tr></table></figure></p>
-<p>这里冒出了2个问题：</p>
-<ol>
-<li>ie8并不支持promise</li>
-<li>ie8promise的callback执行比setTimeout慢</li>
-</ol>
-<p>第一个问题很快被解决，因为打开的页面使用mn（[工程化，开发构建利器]）打包，项目自带了promise补丁 😀<br>第二个问题很令人困惑，当时对event loop和microTask的概念还比较模糊，并不能直接找出问题，于是开始怀疑是<a href="https://github.com/zloirock/core-js" target="_blank" rel="external">core-js</a>(mn打的promise-polyfill)的promise实现有问题，和原生的表现不一致，从而开始拜读corejs的实现代码（俄罗斯大哥真的牛逼，一个人维护整个core-js）</p>
-<h1 id="Promise-Polyfill"><a href="#Promise-Polyfill" class="headerlink" title="Promise Polyfill"></a>Promise Polyfill</h1><blockquote>
-<p>promise的polyfill有多个实现包，包括著名的bluebird, 但是这里只讨论core-js的实现</p>
-</blockquote>
-<p>照例先上一段代码：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// core-js/modules/_microtask.js</span></div><div class="line"></div><div class="line">  <span class="comment">// Node.js</span></div><div class="line">  <span class="keyword">if</span> (isNode) &#123;</div><div class="line">    notify = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</div><div class="line">      process.nextTick(flush);</div><div class="line">    &#125;;</div><div class="line">  <span class="comment">// browsers with MutationObserver</span></div><div class="line">  &#125; <span class="keyword">else</span> <span class="keyword">if</span> (Observer) &#123;</div><div class="line">    <span class="keyword">var</span> toggle = <span class="literal">true</span>;</div><div class="line">    <span class="keyword">var</span> node = <span class="built_in">document</span>.createTextNode(<span class="string">''</span>);</div><div class="line">    <span class="keyword">new</span> Observer(flush).observe(node, &#123; <span class="attr">characterData</span>: <span class="literal">true</span> &#125;); <span class="comment">// eslint-disable-line no-new</span></div><div class="line">    notify = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</div><div class="line">      node.data = toggle = !toggle;</div><div class="line">    &#125;;</div><div class="line">  <span class="comment">// environments with maybe non-completely correct, but existent Promise</span></div><div class="line">  &#125; <span class="keyword">else</span> <span class="keyword">if</span> (<span class="built_in">Promise</span> &amp;&amp; <span class="built_in">Promise</span>.resolve) &#123;</div><div class="line">    <span class="keyword">var</span> promise = <span class="built_in">Promise</span>.resolve();</div><div class="line">    notify = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</div><div class="line">      promise.then(flush);</div><div class="line">    &#125;;</div><div class="line">  <span class="comment">// for other environments - macrotask based on:</span></div><div class="line">  <span class="comment">// - setImmediate</span></div><div class="line">  <span class="comment">// - MessageChannel</span></div><div class="line">  <span class="comment">// - window.postMessag</span></div><div class="line">  <span class="comment">// - onreadystatechange</span></div><div class="line">  <span class="comment">// - setTimeout</span></div><div class="line">  &#125; <span class="keyword">else</span> &#123;</div><div class="line">    notify = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</div><div class="line">      <span class="comment">// strange IE + webpack dev server bug - use .call(global)</span></div><div class="line">      macrotask.call(global, flush);</div><div class="line">    &#125;;</div><div class="line">  &#125;</div></pre></td></tr></table></figure></p>
-<p>代码很简单，通过环境，浏览器的版本等因素找到一个最适合的promise的实现，具体思路如下：</p>
-<h3 id="1-node4-直接使用process-nextTick"><a href="#1-node4-直接使用process-nextTick" class="headerlink" title="1. node4+ 直接使用process.nextTick"></a>1. node4+ 直接使用process.nextTick</h3><p>nextTick是node的私有方法，允许在当前调用栈结束立刻执行回调。</p>
-<h3 id="2-在支持MutationObserver的浏览器使用Observer"><a href="#2-在支持MutationObserver的浏览器使用Observer" class="headerlink" title="2. 在支持MutationObserver的浏览器使用Observer"></a>2. 在支持MutationObserver的浏览器使用Observer</h3><p>MutationObserver用于监听DOM节点，当节点发生变化的时候，执行回调函数。(MutationObserver同样在vue源码中用上了~)当前MutationObserver的proposal已经被废弃。<br><img src="/images/eventloop/WX20180327-210644.png" alt="MutationObserver"></p>
-<h3 id="3-当前环境已经有打promise的补丁的话，直接使用promise补丁"><a href="#3-当前环境已经有打promise的补丁的话，直接使用promise补丁" class="headerlink" title="3. 当前环境已经有打promise的补丁的话，直接使用promise补丁"></a>3. 当前环境已经有打promise的补丁的话，直接使用promise补丁</h3><p>因为如果不支持1，2两种方式的话，说明完全标准的promise补丁已经没法实现了，这个时候只能委屈求全了。</p>
-<h3 id="4-当以上情况都不适用，使用下面的几种backup"><a href="#4-当以上情况都不适用，使用下面的几种backup" class="headerlink" title="4. 当以上情况都不适用，使用下面的几种backup"></a>4. 当以上情况都不适用，使用下面的几种backup</h3><ul>
-<li>node0.8-的process.nextTick(<a href="https://github.com/nodejs/node/wiki/API-changes-between-v0.8-and-v0.10" target="_blank" rel="external">node0.8-的process.nextTick属于macroTask</a>)</li>
-<li>Sphere(游戏引擎) 的Dispatch方法</li>
-<li>MessageChannel（多线程通信, 双向，支持webworker）</li>
-<li>window.postMessage (单向, 支持webworker)</li>
-<li>IE8-监听节点的ONREADYSTATECHANGE事件</li>
-<li>setTimeout (最后的无奈)</li>
-</ul>
-<p>补一张图片说明：<br><img src="/images/eventloop/Promise polyfill.png" alt="promise-polyfill"></p>
-<p>至此可以清晰的了解到core-js的补丁思路，当1，2行的通的时候我们会得到一个“相对标准”的promise。3，4能让我们得到一个“勉强实现的promise”<br>这里回到我们的问题，当文章的示例脚本跑在IE8的时候，很明显我们逻辑会走到ONREADYSTATECHANGE这儿，那么为什么监听的事件回调为什么比setTimeout慢执行呢？是不是所有的事件回调都比setTimeout慢呢？http请求的呢？到底异步队列是怎么实现的？标准如何？</p>
-<p>故事很长，下回再续。</p>
-<!-- # 下回
-[从Promise到Event Loop（二）](http://km.weoa.com/group/fe/article/3474) -->
-<h1 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h1><p><a href="https://developer.mozilla.org/zh-CN/docs/Web/API/MutationObserver" target="_blank" rel="external">MutationObserver</a><br><a href="https://caniuse.com/#search=MutationObserver" target="_blank" rel="external">Caniuse</a><br><a href="https://github.com/YuzuJS/setImmediate#macrotasks-and-microtasks." target="_blank" rel="external">macroTask and microTask</a></p>
-
-          
+          如果你要给Promise打补丁的话，你会怎么实现？core-js又是怎么给promise打补丁的？setTimeoute和promise的执行顺序有何差异？
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2018/04/12/from-promise-polyfill-to-eventloop/">
+              Read more &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -906,7 +707,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/08/18/index/">
+    <link itemprop="mainEntityOfPage" href="https://genuifx.github.io/2017/08/18/index/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="iveswen">
@@ -1092,7 +893,9 @@
                     
                       
                     
-                    <span class="site-state-item-count">2</span>
+                      
+                    
+                    <span class="site-state-item-count">3</span>
                     <span class="site-state-item-name">tags</span>
                   
                 </div>
