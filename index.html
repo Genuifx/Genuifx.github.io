@@ -358,23 +358,23 @@
 <p>为什么0.1+0.2不等于0.3， 而9007199254740992 等于 9007199254740993</p>
 </blockquote>
 <p>大多数静态语言的数字都有不同的数据类型，比方说你想保存一个在<code>[-128; 127]</code>之间的整数，<code>C</code>语言你可以用<code>char</code>，<code>Java</code>可以用<code>byte</code>，他们都占用一个字节。如果你要存储一个大的数字，你可以使用4字节的<code>int</code>或者8字节的<code>long</code>。这些语言对带小数的数字同样有其特殊的数据类型，譬如4字节的<code>float</code>和8字节的<code>double</code>。这两种类型一般都称为浮点类型，后面我们会知道这个名字的缘来。</p>
-<p>但是在<code>Javascript</code>中，我们没有那么多的类型。根据ECMAScript标准，数字只有一种类型，双精度，64位二进制IEEE 754格式的值。这种类型和C与Java的double类型一样，用于存储整数和小数。一些js的开发者没有意识到这一点，于是觉得<code>1</code>是这样存储的：</p>
+<p>但是在<code>Javascript</code>中，我们没有那么多的类型。根据ECMAScript标准，数字只有一种类型，即双精度，64位二进制，符合IEEE 754格式的值。这种类型和C与Java的double类型一样，用于存储整数和小数。一些js的开发者没有意识到这一点，于是觉得<code>1</code>是这样存储的：</p>
 <p><img src="/images/float point/1-wrong.png" alt=""></p>
 <p>然而，实际上是存成这样子的：</p>
 <p><img src="/images/float point/1-right.png" alt=""></p>
 <p>这个误解可能引起很大的困惑，比方说下面这个Java的循环</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">for</span> (<span class="keyword">int</span> i=<span class="number">1</span>; <span class="number">1</span>/i &gt; <span class="number">0</span>; i++) &#123;</div><div class="line">    System.out.println(<span class="string">"Count is: "</span> + i);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>我们很容易知道它是怎么结束循环的，第二次循环的迭代的是会后<code>i</code>变成<code>2</code>，然后<code>1/2</code>等于<code>0.5</code>,因为是int类型，结果被截断为<code>0</code>。循环结束。</p>
+<p>我们很容易知道它是怎么结束循环的，第二次循环迭代的是会后<code>i</code>变成<code>2</code>，然后<code>1/2</code>等于<code>0.5</code>,因为是int类型，结果被截断为<code>0</code>。循环结束。</p>
 <p>现在想象下同样的循环跑在Javascript下：</p>
 <figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">for</span> (<span class="keyword">var</span> i=<span class="number">1</span>; <span class="number">1</span>/i &gt; <span class="number">0</span>; i++) &#123;</div><div class="line">    <span class="built_in">console</span>.log(<span class="string">"Count is: "</span> + i);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
 <p>这是个死循环(╯﹏╰)，因为<code>1/i</code>不会得到一个整数，而是一个浮点数。想知道为啥不，继续往下阅读把💯</p>
 <p>另外一个不熟悉Javascript的人会经常提的问题是0.1加0.2等于<code>0.30000000000000004</code>, 这意味着0.1加0.2不等于0.3。stackoverflow上面有许多这个现象的问题：</p>
 <p><img src="/images/float point/stackoverflow.png" alt=""></p>
 <p>有意思的是，这个问题总是跟Javascript出现，实际上任何使用浮点数的语言都会有这个问题，也就是说，要是你在C或者Java里面用float和double类型，结果是一样的。另外有趣的是0.1+0.2其实不等于浏览器打印的<code>0.30000000000000004</code>，而是<code>0.3000000000000000444089209850062616169452667236328125</code>。</p>
-<p>这篇文章将会解释浮点数，作为示例会分析上述的for循环和0.1+0.2现象。</p>
-<h2 id="使用科学计数法表示数字"><a href="#使用科学计数法表示数字" class="headerlink" title="使用科学计数法表示数字"></a>使用科学计数法表示数字</h2><p>在开始浮点数讲解之后，我们先了解下科学计数法，一般表示为一下形式：</p>
+<p>所以本文将会详细解释浮点数，而作为示例会试着分析上述的for循环和0.1+0.2现象。</p>
+<h2 id="使用科学计数法表示数字"><a href="#使用科学计数法表示数字" class="headerlink" title="使用科学计数法表示数字"></a>使用科学计数法表示数字</h2><p>在开始浮点数讲解之前，我们先了解下科学计数法，一般表示为一下形式：</p>
 <p><img src="/images/float point/scientificNotation.png" alt=""></p>
-<p>significand表示数字重要的数值部分，一般称之为尾数或者精度。尾数不包括0，0只是占位作用。Base则指定了数字系统的基数，如10进制的基数是10，二进制的基数是2。Exponent则决定了小数点要往左或者往右移动几位。</p>
+<p>significant表示数字重要的数值部分，一般称之为尾数或者精度。尾数不包括0，0只是占位作用。Base则指定了数字系统的基数，如10进制的基数是10，二进制的基数是2。Exponent则决定了小数点要往左或者往右移动几位。</p>
 <p>所有的数字都可以用科学计数法表示比方说：</p>
 <p><img src="/images/float point/snexample.png" alt=""></p>
 <p>指数为0意味着小数点不需要移动。<code>0.00000022</code>表示如下：</p>
@@ -384,7 +384,7 @@
 <p>规范化科学计数法：</p>
 <p><img src="/images/float point/snnormallized.png" alt=""></p>
 <p>科学计数法可以理解为数字的浮点表示。“浮点”本来就意味着数字的小数点是可以浮动的。<br>另外根据科学计数法的特点我们会知道，规范化的科学计数写法对二进制数字来说，整数永远都是1。</p>
-<h2 id="IEEE-754浮点数"><a href="#IEEE-754浮点数" class="headerlink" title="IEEE 754浮点数"></a>IEEE 754浮点数</h2><p>IEEE 754定义了很多关于浮点的运算，现在我们只对数字是怎么保存，四舍五入和相加的感兴趣。四舍五入是一个很频繁的操作，一般发生在选定的格式不够保存数字的时候。另外一篇文章有详细讲解<a href="https://medium.com/@maximus.koretskyi/how-to-round-binary-fractions-625c8fa3a1af#.e9nykp8sj" target="_blank" rel="external">二进制的四舍五入</a>。了解其中的机制非常的重要。</p>
+<h2 id="IEEE-754浮点数"><a href="#IEEE-754浮点数" class="headerlink" title="IEEE 754浮点数"></a>IEEE 754浮点数</h2><p>IEEE 754定义了很多关于浮点的运算，现在我们只对数字的存储，四舍五入和相加感兴趣。四舍五入是一个很频繁的操作，一般发生在选定的格式不够保存数字的时候。另外一篇文章有详细讲解<a href="https://medium.com/@maximus.koretskyi/how-to-round-binary-fractions-625c8fa3a1af#.e9nykp8sj" target="_blank" rel="external">二进制的四舍五入</a>。了解其中的机制非常的重要。</p>
 <p>现在我们来看看数字是怎么保存的吧~</p>
 <h3 id="理解数字的存储"><a href="#理解数字的存储" class="headerlink" title="理解数字的存储"></a>理解数字的存储</h3><p>标准规定的格式里面，最常用的是单精度和双精度两种。两者不同的地方在于占用的字节数和能表示的数字范围。将一个科学计数法表示的数字转化为IEEE754格式的算法适用于单精度和双精度，他们只是尾数和指数部分的位数不一样。</p>
 <p>IEEE754浮点数分符号位，尾数和指数。双精度的格式是这么分配的（Javascript的数字类型）：</p>
@@ -400,7 +400,7 @@
 <figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">to64bitFloat</span>(<span class="params">number</span>) </span>&#123;</div><div class="line">    <span class="keyword">var</span> i, result = <span class="string">""</span>;</div><div class="line">    <span class="keyword">var</span> dv = <span class="keyword">new</span> <span class="built_in">DataView</span>(<span class="keyword">new</span> <span class="built_in">ArrayBuffer</span>(<span class="number">8</span>));</div><div class="line"></div><div class="line">    dv.setFloat64(<span class="number">0</span>, number, <span class="literal">false</span>);</div><div class="line"></div><div class="line">    <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; <span class="number">8</span>; i++) &#123;</div><div class="line">        <span class="keyword">var</span> bits = dv.getUint8(i).toString(<span class="number">2</span>);</div><div class="line">        <span class="keyword">if</span> (bits.length &lt; <span class="number">8</span>) &#123;</div><div class="line">            bits = <span class="keyword">new</span> <span class="built_in">Array</span>(<span class="number">8</span> - bits.length).fill(<span class="string">'0'</span>).join(<span class="string">""</span>) + bits;</div><div class="line">        &#125;</div><div class="line">        result += bits;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">return</span> result;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
 <p>调用这个函数，你就会知道<code>1</code>是这样存储的：</p>
 <p><img src="/images/float point/1-right.png" alt=""></p>
-<p>跟想象中的完全不一样啊，尾数部分没有数字，指数部分有很多1。为啥会这样呢？首先我们得知道所有数字都是从规范化的科学计数写法转化过来的。这么做有什么好处呢？如果小数点左边的数字永远是1的话，那么就不用浪费一位去保存它了，在执行数学运算的时候，硬件会这个1补回来。因为<code>1</code>的小数点右边没有其他数，所以尾数部分我们没有东西可以保存，全是0。</p>
+<p>跟想象中的完全不一样啊，尾数部分没有数字，指数部分有很多1。为啥会这样呢？首先我们得知道所有数字都是从规范化的科学计数写法转化过来的。这么做有什么好处呢？如果小数点左边的数字永远是1的话，那么就不用浪费一位去保存它了，只需要在执行数学运算的时候，硬件把这个1补回来即可。因为<code>1</code>的小数点右边没有其他数，所以尾数部分我们没有东西可以保存，全是0。</p>
 <p>现在看看指数部分的1是怎么来的。如上述提到的指数存储的偏移二进制，计算如下：</p>
 <p><img src="/images/float point/offsetbinary.png" alt=""></p>
 <p>可以看到这就是上述表示中的值，所以<code>0</code>在偏移二进制的确是这么保存的。如果还不清楚的话，可以查看我的另外一篇<a href="https://medium.com/@maximus.koretskyi/the-mechanics-behind-exponent-bias-in-floating-point-9b3185083528#.2q5qxmdn3" target="_blank" rel="external">文章</a>。</p>
@@ -411,7 +411,7 @@
 <p>另外一点需要注意的是，尾数部分数字按照科学计数法的表示的顺序放置–即从小数点开始从左到右依序填入。综上所述，用浮点数表示3为：</p>
 <p><img src="/images/float point/3fp.png" alt=""></p>
 <p>用我前面提供的函数会得到一样的结果哦。</p>
-<h3 id="为什么0-1-0-2不是0-3"><a href="#为什么0-1-0-2不是0-3" class="headerlink" title="为什么0.1+0.2不是0.3"></a>为什么0.1+0.2不是0.3</h3><p>既然我们知道数字是如何保存的，接下来看看这个经典的问题。标准的解答如下：</p>
+<h3 id="为什么0-1-0-2不等于0-3"><a href="#为什么0-1-0-2不等于0-3" class="headerlink" title="为什么0.1+0.2不等于0.3"></a>为什么0.1+0.2不等于0.3</h3><p>既然我们知道数字是如何保存的，接下来讨论下这个经典的问题。标准的解答如下：</p>
 <blockquote>
 <p>二进制里面带分母的分数只有2的倍数才能被有限的表示。因为0.1的分母是10，0.2的分母是5都不是2的倍数，所以这些数字不能被有限小数表示。为了以IEEE 754浮点数保存这些小数，不得不把这些尾数进行四舍五入，半进度的10位，单精度的23位，双精度的52位。根据不同的精度位数，浮点数会把0.1和0.2转化比其数学表示大或者小的数。正因为如此0.1+0.2总是不等于0.3</p>
 </blockquote>
