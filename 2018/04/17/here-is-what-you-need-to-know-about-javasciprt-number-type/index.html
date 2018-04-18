@@ -141,7 +141,7 @@
 <meta property="og:image" content="http://yoursite.com/images/float%20point/maxsafecalc.png">
 <meta property="og:image" content="http://yoursite.com/images/float%20point/NaN.png">
 <meta property="og:image" content="http://yoursite.com/images/float%20point/Infinity.png">
-<meta property="og:updated_time" content="2018-04-18T01:38:56.763Z">
+<meta property="og:updated_time" content="2018-04-18T01:43:21.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="关于Javascript的Number类型，你需要知道的东西">
 <meta name="twitter:description" content="原文地址： https://medium.com/dailyjs/javascripts-number-type-8d59199db1b6 为什么0.1+0.2不等于0.3， 而9007199254740992 等于 9007199254740993  大多数静态语言的数字都有不同的数据类型，比方说你想保存一个在[-128; 127]之间的整数，C语言你可以用char，Java可以用byte，他">
@@ -469,13 +469,13 @@
 <p><img src="/images/float point/0.1sn2.png" alt=""></p>
 <p>相加可得：</p>
 <p><img src="/images/float point/add.png" alt=""></p>
-<p>我们需要用浮点表示了相加的结果，所以接下来只需要将他规范化，四舍五入，计算偏移二进制即可：</p>
+<p>我们需要用浮点表示了相加的结果，所以接下来只需要将他规范化，四舍五入（如果需要的话），计算偏移二进制即可：</p>
 <p><img src="/images/float point/0.3calc.png" alt=""></p>
 <p>规范化之后发现超过52位了，我们需要做一次四舍五入：</p>
 <p><img src="/images/float point/resultround.png" alt=""></p>
 <p>最终的浮点表示为：</p>
 <p><img src="/images/float point/resultfp.png" alt=""></p>
-<p>这就是当你计算0.1+0.2的时候保存的准确结果。为了得到这个结果，计算机做三次四舍五入，每个数字各一次，结果一次。而单纯的保存0.3的时候，只做了一次四舍五入。正是四舍五入导致了0.1+0.2的结果跟0.3的表示不一致。当Javascript执行<code>0.1+0.2===0.3</code>的时候，实际上做了按位比较，因为结果不同，自然就返回false了。而0.1和0.2在二进制中不用被有限表示，四舍五入总是存在，故0.1+0.2永远都不会等于0.3。</p>
+<p>这就是当你计算0.1+0.2的时候保存的准确结果。为了得到这个结果，计算机做三次四舍五入，保存每个数字各一次，保存结果一次。而单纯的保存0.3的时候，只做了一次四舍五入。正是四舍五入导致了0.1+0.2的结果跟0.3的表示不一致。当Javascript执行<code>0.1+0.2===0.3</code>的时候，实际上做了按位比较，因为结果不同，自然就返回false了。而0.1和0.2在二进制中不用被有限表示，四舍五入总是存在，故0.1+0.2永远都不会等于0.3。</p>
 <h3 id="为什么for循环会停不下来？"><a href="#为什么for循环会停不下来？" class="headerlink" title="为什么for循环会停不下来？"></a>为什么<code>for</code>循环会停不下来？</h3><p>理解for循环为什么死循环的关键是<code>9007199254740991</code>。这个数字非常的特殊，以至于他有自己的常量表示，下面是EcmaScript标准关于其的描述：</p>
 <blockquote>
 <p><code>Number.MAX_SAFE_INTEGER</code>是一个最大的数字n以至于n+1都可以准确表示一个数字值。<code>Number.MAX_SAFE_INTEGER</code>等于9007199254740991（2⁵³−1）</p>
@@ -492,12 +492,12 @@
 <p>右移小数点52位得：</p>
 <p><img src="/images/float point/maxsafeintn.png" alt=""></p>
 <p>也就是为了保存<code>MAX_SAFE_INTEGER</code>，指数为52的情况下，我们用光了尾数所有的位数来表示它。由于所有位都被用了，要表示更大的数字只能把指数增加1。指数变为<code>53</code>的话，我们得把小数点右移53位，由于尾数只有52位，我们只能在最后添加<code>0</code>补充了,所以指数<code>54</code>就需要补2个0，<code>55</code>就要3个，依次类推。</p>
-<p>这会有什么影响呢，也许你已经猜到了。由于所有大于<code>MAX_SAFE_INTEGER</code>的数，我们会以0结尾，那也就没有奇数能被浮点表示了！</p>
+<p>这会有什么影响呢，也许你已经猜到了。由于所有大于<code>MAX_SAFE_INTEGER</code>的数，我们会以0结尾，那就意味着没有奇数能被浮点表示了！</p>
 <p><img src="/images/float point/maxsafecalc.png" alt=""></p>
 <p>能看到<code>9007199254740993</code>和<code>9007199254740993</code>都不能被64位的浮点数表示。如果你继续试下去便会发现不能表示的数字会有偶数出现！例如<code>9007199254740998</code>。而随着指数的增加，不能表示的范围会越来越大！</p>
 <h3 id="死循环"><a href="#死循环" class="headerlink" title="死循环"></a>死循环</h3><p>再看看<code>for</code>循环：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">for</span> (<span class="keyword">var</span> i=<span class="number">1</span>; <span class="number">1</span>/i &gt; <span class="number">0</span>; i++) &#123;</div><div class="line">    <span class="built_in">console</span>.log(<span class="string">"Count is: "</span> + i);</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
 <p>它不会停下来，上面提到了以为<code>1/i</code>的结果不是一个整数，而是浮点数。现在你已经知道浮点数和<code>Number.MAX_SAFE_INTEGER</code>了，应该很容易理解为啥它不会停止循环。</p>
-<p>如果要循环结束的话，<code>i</code>必须变成<code>Infinity</code>， 因为<code>1/Infinity &gt; 0</code> 是<code>false</code>。 当然这永远不会发生。上面的章节我解释了为啥一些数字不能被表示，以及他们被四舍五入为最近可表达的偶数。当i增加到<code>9007199254740993</code>的时候(也就是<code>MAX_SAFE_INTEGER+2</code>)，由于最后一位数字无法表示，于是只能四舍五入到<code>9007199254740992</code>。于是循环便卡在这两个数字之间了。</p>
+<p>如果要循环结束的话，只有<code>i</code>必须变成<code>Infinity</code>， 因为<code>1/Infinity &gt; 0</code> 是<code>false</code>。 当然这永远不会发生。上面的章节我解释了为啥一些数字不能被表示，以及他们被四舍五入为最近可表达的偶数。当i增加到<code>9007199254740993</code>的时候(也就是<code>MAX_SAFE_INTEGER+2</code>)，由于最后一位数字无法表示，于是只能四舍五入到<code>9007199254740992</code>。于是循环便卡在这两个数字之间了。</p>
 <h2 id="关于NaN和Infinity的几句话"><a href="#关于NaN和Infinity的几句话" class="headerlink" title="关于NaN和Infinity的几句话"></a>关于<code>NaN</code>和<code>Infinity</code>的几句话</h2><p>我决定对<code>NaN</code>和<code>Infinity</code>做一点简述作为文章的结束。<code>NaN</code>意味着<code>Not a Number</code>，它和<code>Infinity</code>不一样，尽管他们都被当初浮点操作的特殊例子去处理。它们的指数是<code>1024</code>（即<code>11111111111</code>），而<code>Number.MAX_VALUE</code>的指数是<code>1023</code>（即<code>111111111101</code>）。</p>
 <p>由于<code>NaN</code>是用浮点表示的，所以当你看到<code>typeof NaN</code>返回<code>number</code>的时候，应该不会惊讶了吧。哦，对了，它的尾数有一个1：</p>
 <p><img src="/images/float point/NaN.png" alt=""></p>
