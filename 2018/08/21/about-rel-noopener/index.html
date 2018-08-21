@@ -113,7 +113,7 @@
 <meta property="og:site_name" content="Genuifx">
 <meta property="og:description" content="有关rel=noopener的一些情报">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-08-21T04:33:34.267Z">
+<meta property="og:updated_time" content="2018-08-21T07:09:39.911Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="关于rel=noopener">
 <meta name="twitter:description" content="有关rel=noopener的一些情报">
@@ -423,7 +423,30 @@
 </blockquote>
 <h2 id="他解决了什么问题？"><a href="#他解决了什么问题？" class="headerlink" title="他解决了什么问题？"></a>他解决了什么问题？</h2><p>假设你现在正在浏览<code>index.html</code>，有一个由用户生成的链接在你的网站里面：</p>
 <blockquote>
-<p><a href="/rel-noopener/index">Click Me!</a></p>
+<p><a href="/test-rel-noopener/" target="_blank">Click Me!(同域)</a></p>
+</blockquote>
+<p>点击上面的链接会打开一个新页面（使用<code>target=_blank</code>）。就这个参数本身而言，并没有值得兴奋的东西。</p>
+<p>然后新打开的页面有一个<code>window.opener</code>对象指向你现在正在浏览的页面<code>index.html</code>。这就意味着一旦用户点击了链接，另外一个页面就能完完整整的控制本窗口的window对象了。</p>
+<p>即便是越狱的情况下<code>window.opener.location</code>一样是可以访问的，CORS并没有控制到这里（注： 从最新的chrome测试情况看，跨域情况下<code>opener.location</code>不能获取数据，可以replace操作，跳转的页面还是可以强迫主页面跳转到一个指定的页面）</p>
+<p>跨域的例子：</p>
+<blockquote>
+<p><a href="https://genuifx.com/test-rel-noopener/" target="_blank">Click Me!（跨域）</a></p>
+</blockquote>
+<p>作为证明了，一旦打开了新页面，本页面会多一个<code>#hax</code>的hash后缀。这只是一个无害的列子，如果它重定向到钓鱼页面，并且要求用户输入登录信息的话，用户很大可能不会注意到页面已经变了，因为页面的跳转的时候用户停留在打开的窗口上，此时旧页面的跳转是在后台进行的。如果在重定向到钓鱼页面之前添加一点延迟的话，这种攻击就显得更加微妙了（<a href="http://www.azarask.in/blog/post/a-new-type-of-phishing-attack/" target="_blank" rel="external">标签抓取</a>）</p>
+<p>（注：标签抓取 tab nabbing 原文指的是用户一旦浏览其他标签页，钓鱼网页在本地里就替换自己的ico和网站标题，例如Gmail的图标+您收到一份邮件的标题。并且把页面改造成类似用户登录的页面， 这种情况下由于页面都是后台更新，用户很容易就上当受骗。）</p>
+<h2 id="推荐做法"><a href="#推荐做法" class="headerlink" title="推荐做法"></a>推荐做法</h2><p>为了防止页面滥用<code>window.opener</code>对象，Chrome49和Opera36中，可以使用<code>rel=noopener</code>来确保<code>opener</code>为空。</p>
+<blockquote>
+<p><a href="/test-rel-noopener/" target="_blank" rel="noopener">Click Me!(noopener)</a></p>
+</blockquote>
+<p>一些旧的浏览器可以使用<code>rel=noreferrer</code>（同时会禁用HTTP的Referrer头）。或者使用js禁用：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">var otherWindow = window.open();</div><div class="line">otherWindow.opener = null;</div><div class="line">otherWindow.location = url;</div></pre></td></tr></table></figure></p>
+<blockquote>
+<p><a href="/test-rel-noopener/" target="_blank" rel="noreferrer">Click Me!(noreferrer)</a></p>
+<p><a href="/test-rel-noopener/" target="_blank" onclick="var otherWindow = window.open();otherWindow.opener = null;otherWindow.location = href;">Click Me!(jsopen)</a></p>
+</blockquote>
+<p>需要注意的是js的方式在Safari不可用。需要支持Safari的话，可以插入一个iframe来打开新的页面，然后马上删掉iframe。</p>
+<p>除非<a href="https://css-tricks.com/use-target_blank/" target="_blank" rel="external">有理由</a>，尽量少使用<code>target=_blank</code>，特别是在用户生成的内容地方。</p>
+<blockquote>
+<p><a href="https://caniuse.com/#search=window.opener" target="_blank" rel="external">caniuse</a></p>
 </blockquote>
 
       
@@ -647,7 +670,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#他解决了什么问题？"><span class="nav-number">1.</span> <span class="nav-text">他解决了什么问题？</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#他解决了什么问题？"><span class="nav-number">1.</span> <span class="nav-text">他解决了什么问题？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#推荐做法"><span class="nav-number">2.</span> <span class="nav-text">推荐做法</span></a></li></ol></div>
             
 
           </div>
