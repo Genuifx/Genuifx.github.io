@@ -1,7 +1,8 @@
 ---
 title: 从Promise到Event Loop（二）
+description: "Javascript的宿主环境是怎么实现Event Loop的？ MicroTask和MacroTask的区别？nodejs的Tick和Phase了解一下~本文从promise-polyfill开始，深入介绍Event Loop的机制"
 date: 2018-04-12 15:59:09
-tags: javascript
+tags: Javascript
 ---
 
 ## 前言

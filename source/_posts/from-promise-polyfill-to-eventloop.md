@@ -1,7 +1,8 @@
 ---
 title: 从Promise到Event Loop（一）
 date: 2018-04-12 15:31:12
-tags: javascript
+description: "如果你要给Promise打补丁的话，你会怎么实现？core-js又是怎么给promise打补丁的？setTimeoute和promise的执行顺序有何差异？"
+tags: Javascript
 ---
 
 # 一切的开始
