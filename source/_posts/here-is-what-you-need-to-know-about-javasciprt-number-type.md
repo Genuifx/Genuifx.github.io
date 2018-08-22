@@ -1,5 +1,5 @@
 ---
-title: 关于Javascript的Number类型，你需要知道的东西
+title: "[译] 关于Javascript的Number类型，你需要知道的东西"
 date: 2018-04-17 15:59:10
 description: "关于Javascript的Number类型，你需要知道所有的东西都在这里！浮点数如何表示？为什么0.1+0.2不等于0.3？9007199254740992 为什么等于 9007199254740993， 不是道德的沦丧，也不是人性的扭曲！"
 tags: [Javascript，Float Point]
