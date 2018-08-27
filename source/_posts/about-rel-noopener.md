@@ -46,7 +46,7 @@ otherWindow.location = url;
 
 除非[有理由](https://css-tricks.com/use-target_blank/)，尽量少使用`target=_blank`，特别是在用户生成的内容地方。
 
-> [caniuse](https://caniuse.com/#search=window.opener)
+> [caniuse](https://caniuse.com/#feat=rel-noopener)
 
 
 > Original(原文地址)：https://mathiasbynens.github.io/rel-noopener/
