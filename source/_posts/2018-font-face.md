@@ -11,9 +11,9 @@ tags: [CSS, FONT, Font-Face]
 
 > [这是一个测试连接，流量够的点 X)](https://genuifx.com/github/font-test/index.html)
 
-但就PC应用而言，加载一个5MB的中文字体只需要几百毫秒（网线直连 chrome：600ms+；小米wifi chrome：5s+），用户能够明显的感受到网页由于字体加载变慢了。移动端的话，随着流量越来越廉价，为了更优化的体验，这点流量似乎也能接受。（毕竟也只是第一次加载才需要完整下载，其他时候一般是304）
+但就PC应用而言，加载一个5MB的字体只需要几百毫秒（网线直连 chrome：600ms+；小米wifi chrome：5s+），用户能够明显的感受到网页由于字体加载变慢了。移动端的话，随着流量越来越廉价，为了更优化的体验，这点流量似乎也能接受。（毕竟也只是第一次加载才需要完整下载，其他时候一般是304）
 
-另外中英文字体大小差距也相当明显，中文字符（6w+）远大于英文字符集，[google-font](https://fonts.google.com)上面的英文字体大多数在1M到2M之间（woff2），而中文字体譬如PingFang体积到5.3M（woff2），我尝试在网上找到一些免费的中文字体有大有小。
+另外中英文字体大小差距也相当明显，中文字符（6w+）远大于英文字符集，[google-font](https://fonts.google.com)上面的英文字体大多数在1M到2M之间（woff2），~~而中文字体譬如PingFang体积到5.3M（woff2）~~，一个7718字符的中文字体包也才1.1MB（woff2） 我尝试在网上找到一些免费的中文字体有大有小。
 
 既然自定义字体未来在生产项目中可以期待，那么必要的了解是必须的。
 
@@ -25,12 +25,12 @@ TrueType字体是Type 1(Adobe公司开发)的竞品，由苹果公司和微软�
 
 TrueType是OpenType的前身，90年代微软寻求苹果的GX排版技术授权失败，被逼自创武功取名为TrueType Open，后来随着计算机的发展，排版技术上需要更加具有表现力的字体，Adobe和微软合作开发了一款新的字体糅合了Type 1和TrueType Open的底层技术，取名为OpenType。后来OpenType被ISO组织接受为标准，称之为Open Font Format（off）。
 
-ttf和otf字体在web端来说兼容相对较好，除开IE（很神奇不）和早期的ios safari和Android，不怎么支持外其他浏览器都兼容都不错。然而虽然它们两在系统层混的很好，到了移动端却不怎么吃香，因为他们的字体文件实在是太大了。。PingFang-SC-Regular字体ttf格式11.3MB而otf要到21.4MB
+ttf和otf字体在web端来说兼容相对较好，除开IE（很神奇不）和早期的ios safari和Android不怎么支持外，其他浏览器都兼容都不错。然而虽然它们俩在桌面端混的很好，到了移动端却不怎么吃香，因为他们的字体文件实在是太大了。。PingFang-SC-Regular字体ttf格式11.3MB而otf要到21.4MB
 
 ![](/images/font-face/caniuse-otf-ttf.png)
 
 ### Embedded OpenType(.eot)
-刚刚提到otf字体虽然在桌面混的风生水起，但是由于体积是在太大了，在web端实在是吃不香，于是微软就是根据OpenType做了压缩，重新取名为Embedded OpenType，顾名思义，这个字体就是为了嵌套到网页做的。后来微软多次给W3C申请，想把EOT当做官方推荐字体，但是最后都没有成功，反倒是WOFF后来居上，成为标准字体。
+刚刚提到otf字体虽然在桌面混的风生水起，但是由于体积太大，在web端实在是吃不香，于是微软就是根据OpenType做了压缩，重新取名为Embedded OpenType，顾名思义，这个字体就是为了嵌套到网页做的。后来微软多次给W3C申请，想把EOT当做官方推荐字体，但是最后都没有成功，反倒是WOFF后来居上，成为标准字体。
 
 EOT是微软的亲儿子，古董IE浏览器都支持这个格式，但是其他主流浏览器并不支持EOT。另外就是eot字体也比ttf文件要大一些，所以除非是为了IE8-的浏览器兼容，完全没有必要用这东西。
 
@@ -59,9 +59,9 @@ woff字体最大的优点就是体积小，同样的字体对比EOT要小20%到4
 所以一个自定义字体定义一般是这样的：
 ```css
 @font-face {
-    font-family: "PingFangSC";
-    src: url("./font/PingFangSC/fonts/PingFang-SC-Regular.woff2") format("woff2"),
-        url("./font/PingFangSC/fonts/PingFang-SC-Regular.woff") format("woff");
+    font-family: "ChangChengChangSongTi";
+    src: url("./font/ChangChengChangSongTi/ChangChengChangSongTi-1.woff2") format("woff2"),
+        url("./font/ChangChengChangSongTi/ChangChengChangSongTi-1.woff") format("woff");
 }
 ```
 
@@ -89,12 +89,12 @@ woff字体最大的优点就是体积小，同样的字体对比EOT要小20%到4
 由于IE8-的浏览器只支持EOT格式的字体， 那么我们似乎只要这么定义就完事了：
 ```css
 @font-face {
-    font-family: "PingFangSC";
-    src: url("./font/PingFangSC/fonts/PingFang-SC-Regular.eot");
+    font-family: "My font";
+    src: url("./path/to/font.eot");
 }
 @font-face {
-    font-family: "PingFangSC";
-    src: url('./font/PingFangSC/fonts/PingFang-SC-Regular.otf');
+    font-family: "My font";
+    src: url('./path/to/font.otf');
 }
 ```
 
@@ -142,6 +142,8 @@ Paul最后一次更新在2010年，文章到现在已经7、8年了。浏览器�
 如果要支持Android4.4以下的设备，就得加上otf文件支持，但正如上述，otf文件太大，在低端安卓机子表现估计也不好，还不如对这部分用户做优雅降级。
 
 最后推荐一个字体格式转化的网站[font-converter](https://font-converter.net/)，免费而且可以一次生成多种格式（包括woff2）的文件，⚠️但注意千万不要直接使用该网站生成font-face规则。
+
+⚠️值得注意的是，不少字体不是给web专门设计使用，使用它们有可能面临体积过大或者版本问题，可以使用[wakamaifondue.com](https://wakamaifondue.com)来检查字体文件的情况。
 
 ## 参考资料
 [Embedded_OpenType](https://en.wikipedia.org/wiki/Embedded_OpenType)
