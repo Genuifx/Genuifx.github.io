@@ -116,7 +116,7 @@
 <meta property="og:image" content="https://genuifx.github.io/images/font-face/caniuse-otf-ttf.png">
 <meta property="og:image" content="https://genuifx.github.io/images/font-face/caniuse-eot.png">
 <meta property="og:image" content="https://genuifx.github.io/images/font-face/caniuse-woff.png">
-<meta property="og:updated_time" content="2018-08-30T06:22:29.351Z">
+<meta property="og:updated_time" content="2018-08-30T06:35:53.421Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="2018年的@font-face">
 <meta name="twitter:description" content="字体攻略、font-face详解，以及2018年的前端应该怎么使用font-face">
@@ -428,7 +428,7 @@
 <p><a href="https://genuifx.com/github/font-test/index.html" target="_blank" rel="external">这是一个测试连接，流量够的点 X)</a></p>
 </blockquote>
 <p>但就PC应用而言，加载一个5MB的字体只需要几百毫秒（网线直连 chrome：600ms+；小米wifi chrome：5s+），用户能够明显的感受到网页由于字体加载变慢了。移动端的话，随着流量越来越廉价，为了更优化的体验，这点流量似乎也能接受。（毕竟也只是第一次加载才需要完整下载，其他时候一般是304）</p>
-<p>另外中英文字体大小差距也相当明显，中文字符（6w+）远大于英文字符集，<a href="https://fonts.google.com" target="_blank" rel="external">google-font</a>上面的英文字体大多数在1M到2M之间（woff2），<del>而中文字体譬如PingFang体积到5.3M（woff2）</del>，一个7718字符的中文字体包也才1.1MB（woff2） 我尝试在网上找到一些免费的中文字体有大有小。</p>
+<p>另外中英文字体大小差距也相当明显，中文字符（6w+）远大于英文字符集，<a href="https://fonts.google.com" target="_blank" rel="external">google-font</a>上面的英文字体大多数在1M到2M之间（woff2），<del>而中文字体譬如PingFang体积到5.3M（woff2）</del>，一个7718字符的中文字体包1.1MB（woff2）, 完整的中文字符集怎么也得10MB了。我尝试在网上找到一些免费的中文字体有大有小，另一个角度看的话，7000+个常用中文字体对于一般的网站来说又似乎足够用了。</p>
 <p>既然自定义字体未来在生产项目中可以期待，那么必要的了解是必须的。</p>
 <h2 id="字体分类"><a href="#字体分类" class="headerlink" title="字体分类"></a>字体分类</h2><p>字体的种类相当的多，有OpenType、TrueType、Type_1等等。一般web用到的有otf、ttf、eot、woff(2)、svg。</p>
 <h3 id="TrueType（-ttf）和OpenType（-otf）"><a href="#TrueType（-ttf）和OpenType（-otf）" class="headerlink" title="TrueType（.ttf）和OpenType（.otf）"></a>TrueType（.ttf）和OpenType（.otf）</h3><p>TrueType字体是Type 1(Adobe公司开发)的竞品，由苹果公司和微软一起开发，是mac系统和window系统用的最广泛的字体，一般从网上下载的字体文件都是ttf格式，点击就能安装到系统上。</p>
