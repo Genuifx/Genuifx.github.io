@@ -13,8 +13,6 @@ QUIC基于UDP协议实现了类似TCP+TLS+HTTP2的功能组合。所以可以把
 ![](/images/quic/quic-fit.png)
 <center>(https://www.nanog.org/sites/default/files//meetings/NANOG64/1051/20150603_Rogan_Quic_Next_Generation_v1.pdf)</center>
 
-那么为什么需要 QUIC ?
-
 ## 为什么需要 QUIC？
 这个问题也可以理解为，HTTP/2 现在有什么硬伤是不能解决的吗？其实HTTP/2的硬伤就是TCP。
 
@@ -26,7 +24,7 @@ TCP 协议在70年代设计敲定，当时的网络丢包率高，网速差，�
 
 这是一个日益高速高速发展的应用层和缓慢进化的网络传输层的矛盾，于是[JIM](https://twitter.com/JimRoskind)（QUIC协议设计师）决定在传输层抛弃TCP，拥抱UDP协议。UDP相对TCP协议来说，是一个不稳定的乐观协议，他不需要握手建立连接，至于什么防止IP攻击，怎么保证数据一致性，这些都是UDP之上的工作，这一点刚好契合我们的需求，把很多工作从传输层移动到了应用层（4层网络模型而言~），如此一来，以后QUIC协议的升级完全不依赖于底层操作系统，只需终端和服务器升级到指定版本即可。
 
-这就是**QUIC 的意义**，以及最终的特性和对比 HTTP/2 的优点。
+这就是**QUIC 的意义**。
 
 ## 对比 HTTP/2 的优势所在？
 
@@ -85,7 +83,7 @@ SPDY 和 HTTP/2 已经实现了**多路复用**。多路复用的指的是我们
 
 如此一来，在启用了 HTTP/2 的网站，我们再也不需要对资源进行合并了（：）压缩还是可以做一下的），毕竟一次性发出去多个资源和建立多个连接一个一个下载资源相比还是会快一下的。
 
-然后 HTTP/2 的多路复用会有个很大的问题，那就是**队头会阻塞**。原因还是因为 TCP 的 Sequence Number 机制，为了保证资源的有序到达，如果传输队列的队头某个资源丢失了，TCP 必须等到这个资源重传成功之后才会通知应用层处理后续资源。
+然后 HTTP/2 的多路复用会有个很大的问题，那就是**队头阻塞**。原因还是因为 TCP 的 Sequence Number 机制，为了保证资源的有序到达，如果传输队列的队头某个资源丢失了，TCP 必须等到这个资源重传成功之后才会通知应用层处理后续资源。
 
 ![](/images/quic/http2-multiplex-head-line-block.png)
 <center>(https://www.nanog.org/sites/default/files//meetings/NANOG64/1051/20150603_Rogan_Quic_Next_Generation_v1.pdf)</center>
@@ -114,7 +112,7 @@ TCP 是按照 4-要素（客户端IP、端口, 服务器IP、端口） 要确定
 
 ## QUIC 现状
 
-HTTP-over-QUIC 将被吸收改名为 HTTP/3。未来的 web 传输不再依赖 TCP 协议，也不再需要系统内核支持，未来的 HTTP 可以跟其他产品一样月更、甚至周更。
+HTTP-over-QUIC 将被吸收改名为 HTTP/3。未来的 web 传输不再依赖 TCP 协议，升级更新也不再需要依赖系统内核升级了，未来的 HTTP 可以跟其他产品一样月更、甚至周更。
 
 目前，如果想体验 QUIC 可以使用 [candy](https://github.com/mholt/caddy/wiki/QUIC) 服务器。candy 在 0.9 版本之后就支持 QUIC 了。
 
