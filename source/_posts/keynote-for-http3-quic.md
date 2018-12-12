@@ -68,7 +68,7 @@ TLS 1.3 是对于1.2、1.1版本的大跃迁，目前还没有正式版。TLS 1.
 
 目前的 QUIC 的拥塞控制主要实现了 TCP 的慢启动，拥塞避免，快重传，快恢复。在这些拥塞控制算法的基础上，再进行改进。
 
-比如单调递增的 Packet Number。TCP 使用了基于字节序号 Sequence Number 和 AKS 来保证消息的有序到达。但是 Sequence Number 在重传的时候有二义性。你不知道下一个 AKS 是上一次请求的响应还是这次重传的响应。而单调递增的 Packet Number 可以避免这个问题，保证采样 RTT 的准确。
+比如单调递增的 Packet Number。TCP 使用了基于字节序号 Sequence Number 和 ACK 来保证消息的有序到达。但是 Sequence Number 在重传的时候有二义性。你不知道下一个 ACK 是上一次请求的响应还是这次重传的响应。而单调递增的 Packet Number 可以避免这个问题，保证采样 RTT 的准确。
 
 > 具体改进可以参考[stgw的文章](https://zhuanlan.zhihu.com/p/32553477)
 
