@@ -2,6 +2,13 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>https://genuifx.github.io/2019/10/08/redux-source-code-reading/</loc>
+    
+    <lastmod>2019-10-08T10:50:47.399Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>https://genuifx.github.io/2018/11/27/keynote-for-http3-quic/</loc>
     
     <lastmod>2018-12-12T02:08:41.653Z</lastmod>
